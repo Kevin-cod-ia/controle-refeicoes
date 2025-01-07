@@ -1,0 +1,184 @@
+{% extends "global/base.html" %}
+
+{% block title %}Home{% endblock title %}
+
+<body>
+    
+    {% include "menu/partials/_header.html" %}
+
+    {% block content %}
+
+    <!-- Título Principal -->
+    <div class="text-center my-3">
+        <h1 id="titulo_home" class="text-success-75">Controle De Refeições <i class="fas fa-utensils"></i> </h1> 
+        <p id="p_home">Cardápio 25/11 à 29/11</p>
+    </div>
+
+    <!-- Grid de Cards -->
+    <div class="container">
+        <div class="row row-cols-1 row-cols-md-5 g-4">
+            <!-- Card 1 (Segunda) -->
+            <div class="col">
+                <div class="card h-100">
+                    <img src="C:\Users\kevin.silva\Documents\Possíveis imagens\images.jpg" class="card-img-top" alt="Imagem do card">
+                    <div class="card-body" id="card_segunda">
+                        <p class="text-left">25/11</p>
+                        <h6 class="card-title text-left">Segunda-feira</h6>
+                        <h5 class="text-left fw-bold">Filé de Frango Grelhado</h5>
+                        <p class="text-left">Com Batata Frita</p>
+                        <div class="d-flex flex-column align-items-start">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="option1" id="option1asegunda">
+                                <label class="form-check-label" for="option1asegunda">Omelete</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="option1" id="option1bsegunda">
+                                <label class="form-check-label" for="option1bsegunda">Marmita de Frango</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="option1" id="option1csegunda">
+                                <label class="form-check-label" for="option1csegunda">Marmita de Carne</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer text-end">
+                        <button class="btn btn-secondary btn-sm">?</button>
+                    </div>
+                </div>
+            </div>
+
+            
+
+            <!-- Card 2 (Terça) -->
+            <div class="col">
+                <div class="card h-100">
+                    <img src="C:\Users\kevin.silva\Documents\Possíveis imagens\284991-original.jpg" class="card-img-top" alt="Imagem do card">
+                    <div class="card-body text-white" id="card_terca">
+                        <p class="text-left">26/11</p>
+                        <h6 class="card-title text-left">Terça-feira</h6>
+                        <h5 class="text-left fw-bold">Bife à Rolê</h5>
+                        <p class="text-left">Com Macarrão Alho e Óleo</p>
+                        <div class="d-flex flex-column align-items-start">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="option2" id="option2aterca">
+                                <label class="form-check-label" for="option2aterca">Omelete</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="option2" id="option2bterca">
+                                <label class="form-check-label" for="option2bterca">Marmita de Frango</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="option2" id="option2cterca">
+                                <label class="form-check-label" for="option2cterca">Marmita de Carne</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer text-end">
+                        <button class="btn btn-secondary btn-sm">?</button>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+            <!-- Card 3 (Quarta) -->
+            <div class="col">
+                <div class="card h-100">
+                    <img src="C:\Users\kevin.silva\Documents\Possíveis imagens\mpicanha-ao-alho-churrasqueira.jpg" class="card-img-top" alt="Imagem do card">
+                    <div class="card-body" id="card_quarta">
+                        <p class="text-left">27/11</p>
+                        <h6 class="card-title text-left">Quarta-feira</h6>
+                        <h5 class="text-left fw-bold">Picanha Suína</h5>
+                        <p class="text-left">Com Couve Refogada</p>
+                        <div class="d-flex flex-column align-items-start">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="option3" id="option3aquarta">
+                                <label class="form-check-label" for="option3aquarta">Omelete</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="option3" id="option3bquarta">
+                                <label class="form-check-label" for="option3bquarta">Marmita de Frango</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="option3" id="option3cquarta">
+                                <label class="form-check-label" for="option3cquarta">Marmita de Carne</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer text-end">
+                        <button class="btn btn-secondary btn-sm">?</button>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- Card 1 (Quinta) -->
+            <div class="col">
+                <div class="card h-100">
+                    <img src="C:\Users\kevin.silva\Documents\Possíveis imagens\Strogonoff-de-Frango.jpg" class="card-img-top" alt="Imagem do card">
+                    <div class="card-body text-white" id="card_quinta">
+                        <p class="text-left">28/11</p>
+                        <h6 class="card-title text-left">Quinta-feira</h6>
+                        <h5 class="text-left fw-bold">Strogonoff de Frango</h5>
+                        <p class="text-left">Com Batata Palha</p>
+                        <div class="d-flex flex-column align-items-start">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="option4" id="option4aquinta">
+                                <label class="form-check-label" for="option4aquinta">Omelete</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="option4" id="option4bquinta">
+                                <label class="form-check-label" for="option4bquinta">Marmita de Frango</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="option4" id="option4cquinta">
+                                <label class="form-check-label" for="option4cquinta">Marmita de Carne</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer text-end">
+                        <button class="btn btn-secondary btn-sm">?</button>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- Card 1 (Sexta) -->
+            <div class="col">
+                <div class="card h-100">
+                    <img src="C:\Users\kevin.silva\Documents\Possíveis imagens\image2.jpg" class="card-img-top" alt="Imagem do card">
+                    <div class="card-body" id="card_sexta">
+                        <p class="text-left">29/11</p>
+                        <h6 class="card-title text-left">Sexta-feira</h6>
+                        <h5 class="text-left fw-bold">Hambúrguer Artesanal</h5>
+                        <p class="text-left">Com Couve Flor Gratinada</p>
+                        <div class="d-flex flex-column align-items-start">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="option5" id="option5asexta">
+                                <label class="form-check-label" for="option5asexta">Omelete</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="option5" id="option5bsexta">
+                                <label class="form-check-label" for="option5bsexta">Marmita de Frango</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="option5" id="option5csexta">
+                                <label class="form-check-label" for="option5csexta">Marmita de Carne</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer text-end">
+                        <button class="btn btn-secondary btn-sm">?</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    {% endblock content %}
