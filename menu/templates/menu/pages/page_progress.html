@@ -1,0 +1,29 @@
+{% extends "global/base.html" %}
+
+{% block title %}Página em progresso{% endblock title %}
+
+
+{% include "menu/partials/_header.html" %}
+
+{% block content %}
+
+<div class="div-page-in-progress">
+
+    <div class="container-page-in-progress">
+    <!-- Título -->
+    <h1>Ops... Página em desenvolvimento!</h1>
+
+    <!-- Mensagem -->
+    <p>
+        Parece que essa página ainda não foi concluída, mas não se preocupe!
+        Nosso desenvolvedor está trabalhando neste momento para concluí-la o mais breve possível.
+    </p>
+
+    <!-- Imagem -->
+    <img class='img-page-in-progress' src="/media/global/sleeping_work.jpg" alt="Página em desenvolvimento">
+    </div>
+
+
+</div>
+
+{% endblock content %}

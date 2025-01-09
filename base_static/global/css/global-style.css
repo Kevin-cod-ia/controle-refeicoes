@@ -180,3 +180,46 @@ body{
 .forgot-password a:hover {
   text-decoration: underline;
 }
+
+
+
+/* Estilo da página em progresso */
+
+.div-page-in-progress {
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  font-family: Arial, sans-serif;
+}
+
+.container-page-in-progress {
+    max-width: 600px;
+}
+
+.container-page-in-progress h1 {
+    font-size: 2rem;
+    color: #333;
+    padding-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+.container-page-in-progress p {
+    font-size: 1.25rem;
+    color: #555;
+    margin-bottom: 2rem;
+}
+
+.img-page-in-progress {
+
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+

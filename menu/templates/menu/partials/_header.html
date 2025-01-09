@@ -1,8 +1,10 @@
+{% load static %}
+
 <!-- Menu Suspenso -->
 <nav class="navbar navbar-expand-lg navbar-light sticky-top bg-success bg-opacity-75">
     <div class="container-fluid">
-        <a class="navbar-brand text-white fw-bold" href="#">
-            <img src="C:\Users\kevin.silva\Documents\Possíveis imagens\logo branco transparente.png" alt="Logo da Empresa" width="200" height="50">
+        <a class="navbar-brand text-white fw-bold" href="{% url "menu:home" %}">
+            <img src= "/media/global/logo_branco_transparente.png" alt="Logo da Empresa" width="200" height="50">
         </a>
         <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -10,13 +12,13 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
-                    <a class="nav-link text-white fw-bold" href="#">Home</a>
+                    <a class="nav-link text-white fw-bold" href="{% url "menu:home" %}">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-white fw-bold" href="#">Avaliações</a>
+                    <a class="nav-link text-white fw-bold" href="{% url "menu:progress_page" %}">Avaliações</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-white fw-bold" href="#">Cardápio anterior</a>
+                    <a class="nav-link text-white fw-bold" href="{% url "menu:progress_page" %}">Cardápio anterior</a>
                 </li>
             </ul>
         </div>
