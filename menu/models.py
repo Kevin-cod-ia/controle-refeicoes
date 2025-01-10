@@ -93,7 +93,7 @@ class Employee(models.Model):
 
     def save(self, *args, **kwargs):
         # Cria o login como nome.primeiro_sobrenome
-        username = slugify(f"{self.first_name}.{self.last_name.split()[0]}")
+        username = slugify(f"{self.first_name.lower()}.{self.last_name.split()[0].lower()}")
         
         # Gera a senha com base na data de nascimento
         password = self.birth_date.strftime("%d%m%Y")
@@ -108,3 +108,28 @@ class Employee(models.Model):
     
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
+
+
+
+
+class MealChoice(models.Model):
+    employee = models.ForeignKey('Employee', on_delete=models.CASCADE, related_name='meal_choices')
+    meal_date = models.DateField()
+    meal_option = models.CharField(max_length=100)
+    
+    class Meta:
+        unique_together = ('employee', 'meal_date')  # Garante uma escolha única por dia para cada funcionário.
+
+    def __str__(self):
+        return f"{self.employee.first_name} - {self.meal_date} - {self.meal_option}"
+    
+
+
+class UserChoice(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    menu = models.ForeignKey(WeekMenu, on_delete=models.CASCADE)
+    option = models.ForeignKey(Options, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('user', 'menu')
+

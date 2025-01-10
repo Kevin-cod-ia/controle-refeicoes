@@ -1,0 +1,62 @@
+{% extends "global/base.html" %}
+{% load menu_filters %}
+
+{% block title %}Home{% endblock title %}
+
+    {% block content %}
+
+    <div class="menu-list">
+        {% for menu in week_menus %}
+        <div class="menu-card">
+            <h2>{{ menu.title }}</h2>
+            <p><strong>Guarnição:</strong> {{ menu.side_dish }}</p>
+            <p><strong>Data:</strong> {{ menu.date_meal|date:"d/m/Y" }}</p>
+
+            {% if menu.image_meal %}
+            <img src="{{ menu.image_meal.url }}" alt="{{ menu.title }}" class="menu-image">
+            {% endif %}
+
+            <form method="post" action="{% url 'menu:save_user_choices' %}">
+                {% csrf_token %}
+                <input type="hidden" name="menu_id" value="{{ menu.id }}">
+                <div class="options">
+                    <label>
+                        <input 
+                            type="radio" 
+                            name="choice" 
+                            value="{{ menu.name_option_1.id }}" 
+                            {% if user_choices|get_option:menu.id == menu.name_option_1.id %}checked{% endif %}
+                        >
+                        {{ menu.name_option_1.name }}
+                    </label>
+
+                    <label>
+                        <input 
+                            type="radio" 
+                            name="choice" 
+                            value="{{ menu.name_option_2.id }}" 
+                            {% if user_choices|get_option:menu.id == menu.name_option_2.id %}checked{% endif %}
+                        >
+                        {{ menu.name_option_2.name }}
+                    </label>
+
+                    <label>
+                        <input 
+                            type="radio" 
+                            name="choice" 
+                            value="{{ menu.name_option_3.id }}" 
+                            {% if user_choices|get_option:menu.id == menu.name_option_3.id %}checked{% endif %}
+                        >
+                        {{ menu.name_option_3.name }}
+                    </label>
+                </div>
+                <button type="submit">Salvar Escolha</button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+
+
+
+
+    {% endblock content %}

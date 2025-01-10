@@ -8,7 +8,9 @@ app_name = 'menu'
 urlpatterns = [
     path('', views.home, name='home'),
     path('page-in-progress', views.progress_page, name='progress_page'),
-    path('login', views.login, name='login')
+    path('login', views.login, name='login'),
+    path('logout', views.logout, name='logout'),
+    path('save-user-choices', views.save_user_choices, name='save_user_choices'),
 ]
 
 if settings.DEBUG:  # Apenas no modo de desenvolvimento
