@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login,logout as auth_logout
 from django.contrib.auth.decorators import login_required
 import copy
-from .models import UserChoice
+from .models import UserChoice, Options
 import logging
 
 logger = logging.getLogger(__name__)
@@ -19,20 +19,6 @@ def home(request):
 
     # Obter as escolhas do usuário
     user_choices_dict = {choice.menu.id: choice.option.id for choice in user_choices}
-
-
-    if request.method == 'POST':
-        for menu in week_menus:
-            menu_id = menu.id
-            option_id = request.POST.get(f'choice_{menu_id}')
-            
-            # Verificar se a escolha já existe, caso contrário, criar uma nova
-            if option_id:
-                choice, created = UserChoice.objects.update_or_create(
-                    user=request.user,
-                    menu=menu,
-                    defaults={'option_id': option_id},
-                )
 
 
     return render(request, 'menu/pages/index.html', {
@@ -85,24 +71,44 @@ def logout(request):
     return redirect('menu:login')
 
 
-
-
 @login_required
 def save_user_choices(request):
     if request.method == 'POST':
         logger.info(request.POST)
-        menu_id = request.POST.get('menu_id')  # Supondo que você tenha uma chave 'menu_id'
-        
+
         # Aqui estamos assumindo que o campo será algo como 'choice_1', 'choice_2', etc.
         for key in request.POST:
             if key.startswith('choice_'):  # Para garantir que estamos pegando os campos corretos
-                menu_id = key.split('_')[1]  # Extrai o menu_id da chave
-                option_id = request.POST.get(key)  # Pega o id da opção escolhida
-                if menu_id and option_id:
-                    UserChoice.objects.update_or_create(
+                # Extrai o ID do menu (que é o dia da semana)
+                menu_id = key.split('_')[1]  # Agora temos o id do menu (por exemplo, 1 para segunda-feira)
+                option_id = request.POST.get(key)  # Pega o id da opção escolhida para esse dia
+
+                if option_id and option_id != 'null':  # Se o option_id não for vazio ou nulo
+                    try:
+                        # Buscando a instância da opção para o dia específico
+                        option_instance = Options.objects.get(id=option_id)
+                    except Options.DoesNotExist:
+                        option_instance = None  # Caso a opção não exista
+
+                    if option_instance:
+                        # Se a opção foi encontrada, cria ou atualiza a escolha
+                        UserChoice.objects.update_or_create(
+                            user=request.user,
+                            menu_id=menu_id,  # Menu_id representando o dia correto
+                            day_of_week=menu_id,  # Usa menu_id para distinguir entre os dias
+                            defaults={'option': option_instance},
+                        )
+                    else:
+                        # Se a opção não existe, podemos registrar um erro ou um valor padrão
+                        logger.error(f"Option with ID {option_id} does not exist for day {menu_id}.")
+                else:  # Se o option_id estiver vazio ou for 'null' (quando desmarcado)
+                    # Deleta a escolha existente se o option_id não foi fornecido (desmarcado)
+                    user_choice = UserChoice.objects.filter(
                         user=request.user,
-                        menu_id=menu_id,
-                        defaults={'option_id': option_id},
+                        menu_id=menu_id,  # Menu_id para o dia correto
+                        day_of_week=menu_id
                     )
+                    if user_choice.exists():
+                        user_choice.delete()  # Deleta a escolha existente quando desmarcado
 
     return redirect('menu:home')

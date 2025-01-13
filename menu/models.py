@@ -129,7 +129,11 @@ class UserChoice(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     menu = models.ForeignKey(WeekMenu, on_delete=models.CASCADE)
     option = models.ForeignKey(Options, on_delete=models.CASCADE)
+    day_of_week = models.IntegerField()
 
     class Meta:
         unique_together = ('user', 'menu')
+
+    def __str__(self):
+        return f"{self.user} - {self.menu}"
 
