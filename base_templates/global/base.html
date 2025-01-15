@@ -7,8 +7,12 @@
 </head>
 
 <body>
-    {% include "menu/partials/_header.html" %}
 
+    {% if request.user.employee.profile.profile == 'RH' or request.user.is_staff == True %}
+        {% include 'menu/partials/_admin_header.html' %}
+    {% else %}
+        {% include 'menu/partials/_header.html' %}
+    {% endif %}
     
     <main>
         {% block content %}{% endblock content %}

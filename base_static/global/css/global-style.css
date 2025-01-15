@@ -222,4 +222,13 @@ body{
 }
 
 
+.menu-admin-div .dropdown-submenu {
+  position: relative;
+}
 
+.menu-admin-div .dropdown-submenu > .dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-left: 0.1rem;
+  margin-top: -0.1rem;
+}

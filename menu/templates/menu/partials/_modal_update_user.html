@@ -1,0 +1,56 @@
+<div class="modal fade" id="editEmployeeModal" tabindex="-1" aria-labelledby="editEmployeeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="editEmployeeModalLabel">Editar Colaborador</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editEmployeeForm" method="post" action="{% url "menu:edit_employee" %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" name="employee_id" id="edit_employee_id">
+                    <div class="mb-3">
+                        <label for="edit_first_name" class="form-label">Nome</label>
+                        <input type="text" class="form-control" id="edit_first_name" name="first_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_last_name" class="form-label">Sobrenome</label>
+                        <input type="text" class="form-control" id="edit_last_name" name="last_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_shift" class="form-label">Turno</label>
+                        <select class="form-select" id="edit_shift" name="shift" required>
+                            {% for shift in shifts_company %}
+                            <option value="{{ shift.id }}">{{ shift.shift }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_company" class="form-label">Empresa</label>
+                        <select class="form-select" id="edit_company" name="company" required>
+                            {% for company in companies %}
+                            <option value="{{ company.id }}">{{ company.company_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_profile" class="form-label">Perfil</label>
+                        <select class="form-select" id="edit_profile" name="profile" required>
+                            {% for profile in profiles %}
+                            <option value="{{ profile.id }}">{{ profile.profile }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_birth_date" class="form-label">Data de Nascimento</label>
+                        <input type="date" class="form-control" id="edit_birth_date" name="birth_date" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

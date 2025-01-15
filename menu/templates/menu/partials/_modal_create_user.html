@@ -1,0 +1,73 @@
+<!-- Modal para criar colaborador -->
+<div class="modal fade" id="createEmployeeModal" tabindex="-1" aria-labelledby="createEmployeeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="createEmployeeModalLabel">Criar Colaborador</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{% url 'menu:create_employee' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <!-- Primeira linha -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="first_name" class="form-label">Nome</label>
+                            <input type="text" id="first_name" name="first_name" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="last_name" class="form-label">Sobrenome</label>
+                            <input type="text" id="last_name" name="last_name" class="form-control" required>
+                        </div>
+                    </div>
+                    <!-- Segunda linha -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="shift" class="form-label">Turno</label>
+                            <select id="shift" name="shift" class="form-select" required>
+                                <option value="" selected disabled>Selecione um turno</option>
+                                {% for shift in shifts_company %}
+                                    <option value="{{ shift.id }}">{{ shift.shift }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="company" class="form-label">Empresa</label>
+                            <select id="company" name="company" class="form-select" required>
+                                <option value="" selected disabled>Selecione uma empresa</option>
+                                {% for company in companies %}
+                                    <option value="{{ company.id }}">{{ company.company_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <!-- Terceira linha -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="birth_date" class="form-label">Data de Nasc.</label>
+                            <input type="date" id="birth_date" name="birth_date" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="profile" class="form-label">Perfil</label>
+                            <select id="profile" name="profile" class="form-select" required>
+                                <option value="" selected disabled>Selecione um perfil</option>
+                                {% for profile in  profiles %}
+                                    <option value="{{ profile.id }}"> {{ profile.profile }} </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <!-- Informação adicional -->
+                    <p class="text-muted small mt-3">
+                        Login e senha serão gerados automaticamente.  <br>
+                        O login de acesso do colaborador é a junção de seu nome com seu primeiro sobrenome (ex. joaquimtorres) e a senha gerada são dia, mês e ano do nascimento (ex. 20092001).
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
