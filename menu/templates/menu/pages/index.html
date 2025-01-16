@@ -29,44 +29,24 @@
                             <p class="text-left"> Com {{ week_menu.0.side_dish }} </p>
                             <div class="d-flex flex-column align-items-start">
                                 <div class="d-flex flex-column align-items-start">
-                                    <div class="form-check form-check-inline">
-                                        <input 
-                                            type="hidden" 
-                                            name="choice_{{ week_menu.0.id }}" 
-                                            value="null"
-                                        >
-                                        <input 
-                                            class="form-check-input" 
-                                            type="radio" 
-                                            name="choice_{{ week_menu.0.id }}" 
-                                            value="{{ week_menu.0.name_option_1.id }}" 
-                                            id="option1asegunda"
-                                            {% if user_choices|get_option:week_menu.0.id == week_menu.0.name_option_1.id %}checked{% endif %}
-                                        >
-                                        <label class="form-check-label" for="option1asegunda">{{ week_menu.0.name_option_1.name_option }}</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input 
-                                            class="form-check-input" 
-                                            type="radio" 
-                                            name="choice_{{ week_menu.0.id }}" 
-                                            value="{{ week_menu.0.name_option_2.id }}" 
-                                            id="option1bsegunda"
-                                            {% if user_choices|get_option:week_menu.0.id == week_menu.0.name_option_2.id %}checked{% endif %}
-                                        >
-                                        <label class="form-check-label" for="option1bsegunda">{{ week_menu.0.name_option_2.name_option }}</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input 
-                                            class="form-check-input" 
-                                            type="radio" 
-                                            name="choice_{{ week_menu.0.id }}" 
-                                            value="{{ week_menu.0.name_option_3.id }}" 
-                                            id="option1csegunda"
-                                            {% if user_choices|get_option:week_menu.0.id == week_menu.0.name_option_3.id %}checked{% endif %}
-                                        >
-                                        <label class="form-check-label" for="option1csegunda">{{ week_menu.0.name_option_3.name_option }}</label>
-                                    </div>
+                                    <input 
+                                                type="hidden" 
+                                                name="choice_{{ week_menu.0.id }}" 
+                                                value="null"
+                                            >
+                                    {% for option in week_menu.0.options.all %}
+                                        <div class="form-check form-check-inline">
+                                            <input 
+                                                class="form-check-input" 
+                                                type="radio" 
+                                                name="choice_{{ week_menu.0.id }}" 
+                                                value="{{ option.id }}" 
+                                                id="option{{ week_menu.0.id }}_{{ forloop.counter }}"
+                                                {% if user_choices|get_option:week_menu.0.id == option.id %}checked{% endif %}
+                                            >
+                                            <label class="form-check-label" for="option{{ week_menu.0.id }}_{{ forloop.counter }}">{{ option.name_option }}</label>
+                                        </div>
+                                    {% endfor %}
                                 </div>
         
                             </div>
@@ -89,44 +69,24 @@
                             <h5 class="text-left fw-bold">{{ week_menu.1.title }}</h5>
                             <p class="text-left">Com {{ week_menu.1.side_dish }}</p>
                             <div class="d-flex flex-column align-items-start">
-                                <div class="form-check form-check-inline">
-                                    <input 
+                                <input 
                                             type="hidden" 
                                             name="choice_{{ week_menu.1.id }}" 
                                             value="null"
-                                    >
-                                    <input 
-                                        class="form-check-input" 
-                                        type="radio" 
-                                        name="choice_{{ week_menu.1.id }}" 
-                                        value="{{ week_menu.1.name_option_1.id }}" 
-                                        id="option1aterca"
-                                        {% if user_choices|get_option:week_menu.1.id == week_menu.1.name_option_1.id %}checked{% endif %}
-                                    >
-                                    <label class="form-check-label" for="option1aterca">{{ week_menu.1.name_option_1.name_option }}</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input 
-                                        class="form-check-input" 
-                                        type="radio" 
-                                        name="choice_{{ week_menu.1.id }}" 
-                                        value="{{ week_menu.1.name_option_2.id }}" 
-                                        id="option1bterca"
-                                        {% if user_choices|get_option:week_menu.1.id == week_menu.1.name_option_2.id %}checked{% endif %}
-                                    >
-                                    <label class="form-check-label" for="option1bterca">{{ week_menu.1.name_option_2.name_option }}</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input 
-                                        class="form-check-input" 
-                                        type="radio" 
-                                        name="choice_{{ week_menu.1.id }}" 
-                                        value="{{ week_menu.1.name_option_3.id }}" 
-                                        id="option1cterca"
-                                        {% if user_choices|get_option:week_menu.1.id == week_menu.1.name_option_3.id %}checked{% endif %}
-                                    >
-                                    <label class="form-check-label" for="option1cterca">{{ week_menu.1.name_option_3.name_option }}</label>
-                                </div>
+                                        >
+                                {% for option in week_menu.1.options.all %}
+                                    <div class="form-check form-check-inline">
+                                        <input 
+                                            class="form-check-input" 
+                                            type="radio" 
+                                            name="choice_{{ week_menu.1.id }}" 
+                                            value="{{ option.id }}" 
+                                            id="option{{ week_menu.1.id }}_{{ forloop.counter }}"
+                                            {% if user_choices|get_option:week_menu.1.id == option.id %}checked{% endif %}
+                                        >
+                                        <label class="form-check-label" for="option{{ week_menu.1.id }}_{{ forloop.counter }}">{{ option.name_option }}</label>
+                                    </div>
+                                {% endfor %}
                             </div>
     
                         </div>
@@ -135,8 +95,6 @@
                         </div>
                     </div>
                 </div>
-
-
 
 
                 <!-- Card 3 (Quarta) -->
@@ -149,44 +107,24 @@
                             <h5 class="text-left fw-bold"> {{ week_menu.2.title }} </h5>
                             <p class="text-left">Com  {{ week_menu.2.side_dish }} </p>
                             <div class="d-flex flex-column align-items-start">
-                                <div class="form-check form-check-inline">
-                                    <input 
+                                <input 
                                             type="hidden" 
                                             name="choice_{{ week_menu.2.id }}" 
                                             value="null"
-                                    >
-                                    <input 
-                                        class="form-check-input" 
-                                        type="radio" 
-                                        name="choice_{{ week_menu.2.id }}" 
-                                        value="{{ week_menu.2.name_option_1.id }}" 
-                                        id="option1aquarta"
-                                        {% if user_choices|get_option:week_menu.2.id == week_menu.2.name_option_1.id %}checked{% endif %}
-                                    >
-                                    <label class="form-check-label" for="option1aquarta">{{ week_menu.2.name_option_1.name_option }}</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input 
-                                        class="form-check-input" 
-                                        type="radio" 
-                                        name="choice_{{ week_menu.2.id }}" 
-                                        value="{{ week_menu.2.name_option_2.id }}" 
-                                        id="option1bquarta"
-                                        {% if user_choices|get_option:week_menu.2.id == week_menu.2.name_option_2.id %}checked{% endif %}
-                                    >
-                                    <label class="form-check-label" for="option1bquarta">{{ week_menu.2.name_option_2.name_option }}</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input 
-                                        class="form-check-input" 
-                                        type="radio" 
-                                        name="choice_{{ week_menu.2.id }}" 
-                                        value="{{ week_menu.2.name_option_3.id }}" 
-                                        id="option1cquarta"
-                                        {% if user_choices|get_option:week_menu.2.id == week_menu.2.name_option_3.id %}checked{% endif %}
-                                    >
-                                    <label class="form-check-label" for="option1cquarta">{{ week_menu.2.name_option_3.name_option }}</label>
-                                </div>
+                                        >
+                                {% for option in week_menu.2.options.all %}
+                                    <div class="form-check form-check-inline">
+                                        <input 
+                                            class="form-check-input" 
+                                            type="radio" 
+                                            name="choice_{{ week_menu.2.id }}" 
+                                            value="{{ option.id }}" 
+                                            id="option{{ week_menu.2.id }}_{{ forloop.counter }}"
+                                            {% if user_choices|get_option:week_menu.2.id == option.id %}checked{% endif %}
+                                        >
+                                        <label class="form-check-label" for="option{{ week_menu.2.id }}_{{ forloop.counter }}">{{ option.name_option }}</label>
+                                    </div>
+                                {% endfor %}
                             </div>
     
                         </div>
@@ -195,7 +133,6 @@
                         </div>
                     </div>
                 </div>
-
 
 
                 <!-- Card 1 (Quinta) -->
@@ -208,44 +145,24 @@
                             <h5 class="text-left fw-bold"> {{ week_menu.3.title}} </h5>
                             <p class="text-left">Com {{ week_menu.3.side_dish}} </p>
                             <div class="d-flex flex-column align-items-start">
-                                <div class="form-check form-check-inline">
-                                    <input 
+                                <input 
                                             type="hidden" 
                                             name="choice_{{ week_menu.3.id }}" 
                                             value="null"
-                                    >
-                                    <input 
-                                        class="form-check-input" 
-                                        type="radio" 
-                                        name="choice_{{ week_menu.3.id }}" 
-                                        value="{{ week_menu.3.name_option_1.id }}" 
-                                        id="option1asegunda"
-                                        {% if user_choices|get_option:week_menu.3.id == week_menu.3.name_option_1.id %}checked{% endif %}
-                                    >
-                                    <label class="form-check-label" for="option1aquinta">{{ week_menu.3.name_option_1.name_option }}</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input 
-                                        class="form-check-input" 
-                                        type="radio" 
-                                        name="choice_{{ week_menu.3.id }}" 
-                                        value="{{ week_menu.3.name_option_2.id }}" 
-                                        id="option1bquinta"
-                                        {% if user_choices|get_option:week_menu.3.id == week_menu.3.name_option_2.id %}checked{% endif %}
-                                    >
-                                    <label class="form-check-label" for="option1bquinta">{{ week_menu.3.name_option_2.name_option }}</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input 
-                                        class="form-check-input" 
-                                        type="radio" 
-                                        name="choice_{{ week_menu.3.id }}" 
-                                        value="{{ week_menu.3.name_option_3.id }}" 
-                                        id="option1cquinta"
-                                        {% if user_choices|get_option:week_menu.3.id == week_menu.3.name_option_3.id %}checked{% endif %}
-                                    >
-                                    <label class="form-check-label" for="option1cquinta">{{ week_menu.3.name_option_3.name_option }}</label>
-                                </div>
+                                        >
+                                {% for option in week_menu.3.options.all %}
+                                    <div class="form-check form-check-inline">
+                                        <input 
+                                            class="form-check-input" 
+                                            type="radio" 
+                                            name="choice_{{ week_menu.3.id }}" 
+                                            value="{{ option.id }}" 
+                                            id="option{{ week_menu.3.id }}_{{ forloop.counter }}"
+                                            {% if user_choices|get_option:week_menu.3.id == option.id %}checked{% endif %}
+                                        >
+                                        <label class="form-check-label" for="option{{ week_menu.3.id }}_{{ forloop.counter }}">{{ option.name_option }}</label>
+                                    </div>
+                                {% endfor %}
                             </div>
     
                         </div>
@@ -267,46 +184,25 @@
                             <h5 class="text-left fw-bold"> {{ week_menu.4.title}} </h5>
                             <p class="text-left">Com {{ week_menu.4.side_dish}} </p>
                             <div class="d-flex flex-column align-items-start">
-                                <div class="form-check form-check-inline">
-                                    <input 
+                                <input 
                                             type="hidden" 
                                             name="choice_{{ week_menu.4.id }}" 
                                             value="null"
-                                    >
-                                    <input 
-                                        class="form-check-input" 
-                                        type="radio" 
-                                        name="choice_{{ week_menu.4.id }}" 
-                                        value="{{ week_menu.4.name_option_1.id }}" 
-                                        id="option1asexta"
-                                        {% if user_choices|get_option:week_menu.4.id == week_menu.4.name_option_1.id %}checked{% endif %}
-                                    >
-                                    <label class="form-check-label" for="option1asexta">{{ week_menu.4.name_option_1.name_option }}</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input 
-                                        class="form-check-input" 
-                                        type="radio" 
-                                        name="choice_{{ week_menu.4.id }}" 
-                                        value="{{ week_menu.4.name_option_2.id }}" 
-                                        id="option1bsexta"
-                                        {% if user_choices|get_option:week_menu.4.id == week_menu.4.name_option_2.id %}checked{% endif %}
-                                    >
-                                    <label class="form-check-label" for="option1bsexta">{{ week_menu.4.name_option_2.name_option }}</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input 
-                                        class="form-check-input" 
-                                        type="radio" 
-                                        name="choice_{{ week_menu.4.id }}" 
-                                        value="{{ week_menu.4.name_option_3.id }}" 
-                                        id="option1csexta"
-                                        {% if user_choices|get_option:week_menu.4.id == week_menu.4.name_option_3.id %}checked{% endif %}
-                                    >
-                                    <label class="form-check-label" for="option1csexta">{{ week_menu.4.name_option_3.name_option }}</label>
-                                </div>
+                                        >
+                                {% for option in week_menu.4.options.all %}
+                                    <div class="form-check form-check-inline">
+                                        <input 
+                                            class="form-check-input" 
+                                            type="radio" 
+                                            name="choice_{{ week_menu.4.id }}" 
+                                            value="{{ option.id }}" 
+                                            id="option{{ week_menu.4.id }}_{{ forloop.counter }}"
+                                            {% if user_choices|get_option:week_menu.4.id == option.id %}checked{% endif %}
+                                        >
+                                        <label class="form-check-label" for="option{{ week_menu.4.id }}_{{ forloop.counter }}">{{ option.name_option }}</label>
+                                    </div>
+                                {% endfor %}
                             </div>
-    
                         </div>
                         <div class="card-footer text-end">
                             <a href="{% url 'menu:progress_page' %}" class="btn btn-secondary btn-sm">?</a>

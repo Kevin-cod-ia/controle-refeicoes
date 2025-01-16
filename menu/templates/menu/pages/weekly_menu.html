@@ -1,0 +1,335 @@
+{% extends "global/base.html" %}
+{% load menu_filters %}
+
+
+{% block title %}Cardápio Semanal{% endblock title %}
+
+{% block content %}
+
+    <div class="container">
+        <!-- Título -->
+        <div class="text-center my-3">
+            <h1 id="titulo_home" class="text-success-75">Cardápio Semanal</h1>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" action="{% url 'menu:update_weekly_menu' %}">
+            {% csrf_token %}
+            <!-- Grid com 5 Cards -->
+            <div class="row">
+                <!-- Cards para os dias da semana -->
+                
+                <div class="col-12">
+
+                    <!-- Card para Segunda-feira -->
+                    <div class="card mb-3">
+                        <div class="card-header bg-success text-white">
+                            Segunda-feira
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-2">
+                                <div class="col mb-3">
+                                    <label for="prato-principal-segunda" class="form-label">Prato Principal</label>
+                                    <input type="text" class="form-control" id="prato-principal-segunda" 
+                                     name="prato_principal_segunda" value="{{ week_menu.0.title }}">
+                                </div>
+                                <div class="col mb-3">
+                                    <label for="guarnicao-segunda" class="form-label">Guarnição</label>
+                                    <input type="text" class="form-control" id="guarnicao-segunda" 
+                                    name="guarnicao_segunda" value="{{ week_menu.0.side_dish }}">
+                                </div>
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label for="dia-segunda" class="form-label">Dia</label>
+                                    <input type="date" class="form-control" id="dia-segunda" 
+                                    name="data_segunda" value="{{ week_menu.0.date_meal|date:'Y-m-d' }}">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="foto-segunda" class="form-label">Foto</label>
+                                    <input type="file" name="foto_segunda" class="form-control" id="foto-segunda">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="qt-opcoes-segunda" class="form-label">Qt. Opções</label>
+                                    <input type="number" class="form-control" id="qt-opcoes-segunda" min="1" max="10" 
+                                    name="qt_opcoes_segunda" value="{{ options_week_menu.0 }}">
+                                </div>
+                            </div>
+                            <div id="opcoes-segunda" name="opcoes_segunda" class="mt-3">
+                                <label class="form-label">Opções</label>
+                                <!-- Campos de opções serão adicionados dinamicamente -->
+                            </div>
+                            
+                        </div>
+                    </div>
+             
+
+                    <!-- Card para Terça-feira -->
+                    <div class="card mb-3">
+                        <div  class="card-header bg-success text-white">
+                            Terça-feira
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-2">
+                                <div class="col mb-3">
+                                    <label for="prato-principal-terca" class="form-label">Prato Principal</label>
+                                    <input type="text" class="form-control" id="prato-principal-terca" 
+                                    name="prato_principal_terca" value="{{ week_menu.1.title }}">
+                                </div>
+                                <div class="col mb-3">
+                                    <label for="guarnicao-terca" class="form-label">Guarnição</label>
+                                    <input type="text" class="form-control" id="guarnicao-terca" 
+                                    name="guarnicao_terca" value="{{ week_menu.1.side_dish }}">
+                                </div>
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label for="dia-terca" class="form-label">Dia</label>
+                                    <input type="date" class="form-control" id="dia-terca" 
+                                    name="data_terca" value="{{ week_menu.1.date_meal|date:'Y-m-d' }}">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="foto-terca" class="form-label">Foto</label>
+                                    <input type="file" name="foto_terca" class="form-control" id="foto-terca">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="qt-opcoes-terca" class="form-label">Qt. Opções</label>
+                                    <input type="number" class="form-control" id="qt-opcoes-terca" min="1" max="10" value="{{ options_week_menu.1 }}">
+                                </div>
+                            </div>
+                            <div id="opcoes-terca" class="mt-3">
+                                <label class="form-label">Opções</label>
+                                <!-- Campos de opções adicionados dinamicamente -->
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Card para Quarta-feira -->
+                    <div class="card mb-3">
+                        <div class="card-header bg-success text-white">
+                            Quarta-feira
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-2">
+                                <div class="col mb-3">
+                                    <label for="prato-principal-quarta" class="form-label">Prato Principal</label>
+                                    <input type="text" class="form-control" id="prato-principal-quarta" 
+                                    name="prato_principal_quarta"  value="{{ week_menu.2.title }}">
+                                </div>
+                                <div class="col mb-3">
+                                    <label for="guarnicao-quarta" class="form-label" name="guarnicao_segunda" >Guarnição</label>
+                                    <input type="text" class="form-control" id="guarnicao-quarta" 
+                                    name="guarnicao_quarta" value="{{ week_menu.2.side_dish }}">
+                                </div>
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label for="dia-quarta" class="form-label">Dia</label>
+                                    <input type="date" class="form-control" id="dia-quarta" 
+                                    name="data_quarta" value="{{ week_menu.2.date_meal|date:'Y-m-d' }}">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="foto-quarta" class="form-label">Foto</label>
+                                    <input type="file" name="foto_quarta" class="form-control" id="foto-quarta">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="qt-opcoes-quarta" class="form-label">Qt. Opções</label>
+                                    <input type="number" class="form-control" id="qt-opcoes-quarta" min="1" max="10"
+                                    value="{{ options_week_menu.2  }}">
+                                </div>
+                            </div>
+                            <div id="opcoes-quarta" class="mt-3">
+                                <label class="form-label">Opções</label>
+                                <!-- Campos de opções adicionados dinamicamente -->
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Card para Quinta-feira -->
+                    <div class="card mb-3">
+                        <div class="card-header bg-success text-white">
+                            Quinta-feira
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-2">
+                                <div class="col mb-3">
+                                    <label for="prato-principal-quinta" class="form-label">Prato Principal</label>
+                                    <input type="text" class="form-control" id="prato-principal-quinta" 
+                                    name="prato_principal_quinta" value="{{ week_menu.3.title }}">
+                                </div>
+                                <div class="col mb-3">
+                                    <label for="guarnicao-quinta" class="form-label">Guarnição</label>
+                                    <input type="text" class="form-control" id="guarnicao-quinta" 
+                                    name="guarnicao_quinta" value="{{ week_menu.3.side_dish }}">
+                                </div>
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label for="dia-quinta" class="form-label">Dia</label>
+                                    <input type="date" class="form-control" id="dia-quinta" 
+                                    name="data_quinta"  value="{{ week_menu.3.date_meal|date:'Y-m-d' }}">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="foto-quinta" class="form-label">Foto</label>
+                                    <input type="file" name="foto_quinta" class="form-control" id="foto-quinta">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="qt-opcoes-quinta" class="form-label">Qt. Opções</label>
+                                    <input type="number" class="form-control" id="qt-opcoes-quinta" min="1" max="10"
+                                    value="{{ options_week_menu.3  }}">
+                                </div>
+                            </div>
+                            <div id="opcoes-quinta" class="mt-3">
+                                <label class="form-label">Opções</label>
+                                <!-- Campos de opções adicionados dinamicamente -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card para Sexta-feira -->
+                    <div class="card mb-3">
+                        <div class="card-header bg-success text-white">
+                            Sexta-feira
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-2">
+                                <div class="col mb-3">
+                                    <label for="prato-principal-sexta" class="form-label">Prato Principal</label>
+                                    <input type="text" class="form-control" id="prato-principal-sexta" 
+                                    name="prato_principal_sexta" value="{{ week_menu.4.title }}">
+                                </div>
+                                <div class="col mb-3">
+                                    <label for="guarnicao-sexta" class="form-label">Guarnição</label>
+                                    <input type="text" class="form-control" id="guarnicao-sexta" 
+                                    name="guarnicao_sexta" value="{{ week_menu.4.side_dish }}">
+                                </div>
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label for="dia-sexta" class="form-label">Dia</label>
+                                    <input type="date" class="form-control" id="dia-sexta" 
+                                    name="data_sexta" value="{{ week_menu.4.date_meal|date:'Y-m-d' }}">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="foto-sexta" class="form-label">Foto</label>
+                                    <input type="file" name="foto_sexta" class="form-control" id="foto-sexta">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="qt-opcoes-sexta" class="form-label">Qt. Opções</label>
+                                    <input type="number" class="form-control" id="qt-opcoes-sexta" min="1" max="10"
+                                    value="{{ options_week_menu.4 }}">
+                                </div>
+                            </div>
+                            <div id="opcoes-sexta" class="mt-3">
+                                <label class="form-label">Opções</label>
+                                <!-- Campos de opções adicionados dinamicamente -->
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+            </div>
+
+            <!-- Botão Salvar -->
+            <div class="d-flex justify-content-end mt-4">
+                <button type="submit" class="btn btn-success w-100">Salvar</button>
+            </div>
+        </div>
+
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Lista de opções para cada dia da semana com base nas opções passadas da view Django
+            const optionsByDay = {
+                segunda: [
+                    {% for opcao in options_monday %}
+                        { id: "{{ opcao.id }}", name: "{{ opcao.name_option }}" },
+                    {% endfor %}
+                ],
+                terca: [
+                    {% for opcao in options_tuesday %}
+                        { id: "{{ opcao.id }}", name: "{{ opcao.name_option }}" },
+                    {% endfor %}
+                ],
+                quarta: [
+                    {% for opcao in options_wednesday %}
+                        { id: "{{ opcao.id }}", name: "{{ opcao.name_option }}" },
+                    {% endfor %}
+                ],
+                quinta: [
+                    {% for opcao in options_thursday %}
+                        { id: "{{ opcao.id }}", name: "{{ opcao.name_option }}" },
+                    {% endfor %}
+                ],
+                sexta: [
+                    {% for opcao in options_friday %}
+                        { id: "{{ opcao.id }}", name: "{{ opcao.name_option }}" },
+                    {% endfor %}
+                ],
+            };
+    
+            // Função para gerar os campos de opções dinamicamente
+            function updateOptions(dayId, numOptions) {
+                const container = document.getElementById(`opcoes-${dayId}`);
+                container.innerHTML = ""; // Limpa as opções existentes
+    
+                // Obtém as opções específicas para o dia
+                const optionsList = optionsByDay[dayId];
+    
+                if (!optionsList) return; // Se o dia não tiver opções, sai
+    
+                for (let i = 1; i <= numOptions; i++) {
+                    // Cria o elemento <select>
+                    const select = document.createElement("select");
+                    select.className = "form-select mb-2";
+                    select.name = `${dayId}-option-${i}`;
+    
+                    // Adiciona as opções ao <select>
+                    optionsList.forEach((option, index) => {
+                        const optionElement = document.createElement("option")
+                        optionElement.value = option.id;
+                        optionElement.textContent = option.name;
+    
+                        // Se o índice corresponder ao número da opção, marca como selecionado
+                        if (index === i - 1) {
+                            optionElement.selected = true; // Marca a opção correspondente
+                        }
+    
+                        select.appendChild(optionElement);
+                    });
+    
+                    container.appendChild(select);
+                }
+            }
+    
+            // Adiciona o evento de alteração para todos os campos de Qt. Opções
+            document.querySelectorAll('input[type="number"]').forEach(input => {
+                input.addEventListener("input", function () {
+                    const dayId = this.id.split("-")[2]; // Obtém o ID do dia (e.g., segunda, terca)
+                    const numOptions = parseInt(this.value, 10);
+    
+                    if (!isNaN(numOptions) && numOptions > 0 && numOptions <= 10) {
+                        updateOptions(dayId, numOptions);
+                    }
+                });
+    
+                // Inicializa os campos de opções com base no valor inicial
+                const dayId = input.id.split("-")[2];
+                const numOptions = parseInt(input.value, 10);
+                if (!isNaN(numOptions) && numOptions > 0 && numOptions <= 10) {
+                    updateOptions(dayId, numOptions);
+                }
+            });
+        });
+    </script>
+    
+    
+    
+    
+
+{% endblock content %}
+

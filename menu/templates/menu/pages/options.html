@@ -1,0 +1,215 @@
+{% extends "global/base.html" %}
+{% load menu_filters %}
+
+
+{% block title %}Opções{% endblock title %}
+
+{% block content %}
+
+    <div class="container">
+        <!-- Título -->
+        <div class="text-center my-3">
+            <h1 id="titulo_home" class="text-success-75">Opções</h1>
+        </div>
+
+        <!-- Filtros e Paginação -->
+        <form method="get" action="" class="mb-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="input-group" style="max-width: 400px;">
+                    <input type="text" name="search" class="form-control" placeholder="Pesquisar por nome" value="{{ request.GET.search }}">
+                    <button class="btn btn-outline-secondary" type="submit">🔍</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Tabela -->
+        <div class="table-container">
+            <table class="table table-bordered table-striped table-hover">
+                <thead class="table-secondary">
+                    <tr>
+                        <th><input type="checkbox" id="select-all"></th>
+                        <th>Opção</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for option in page_obj %}
+                        <tr>
+                            <td><input type="checkbox" class="select-row" value='{{ option.id }}'></td>
+                            <td>{{ option.name_option }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginação -->
+        {% include "menu/partials/_pagination.html" %}
+        
+
+        <!-- Botões -->
+    <div class="btn-group-custom mt-3">
+        <button class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#createModal">Criar</button>
+        <button id='edit-button' class="btn btn-warning me-2" 
+        data-bs-toggle="modal" 
+        data-bs-target="#editModal" >
+            Editar
+        </button>
+        <button id='delete-button' class="btn btn-danger me-2" 
+        data-bs-toggle="modal" 
+        data-bs-target="#deleteModal">
+            Excluir
+        </button>
+    </div>
+
+
+
+    {% comment %} {% include "menu/partials/_modal_create_user.html" %}
+    {% include "menu/partials/_modal_update_user.html" %}
+    {% include "menu/partials/_modal_delete_user.html" %} {% endcomment %}
+
+
+    <script>
+        // Script para selecionar/desmarcar todas as linhas
+        document.getElementById('select-all').addEventListener('change', function () {
+            const checkboxes = document.querySelectorAll('.select-row');
+            checkboxes.forEach(cb => cb.checked = this.checked);
+        });
+
+        const createModal = new bootstrap.Modal(document.getElementById('createModal'));
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Selecionando elementos
+            const checkboxes = document.querySelectorAll('.select-row'); // Classe correta dos checkboxes
+            const editarButton = document.querySelector('#edit-button'); // ID correto do botão "Editar"
+
+            // Inicialmente desabilita o botão
+            editarButton.disabled = true;
+    
+            // Função para verificar se algum checkbox está selecionado
+            const verificarSelecao = () => {
+                const algumSelecionado = Array.from(checkboxes).some(checkbox => checkbox.checked);
+                editarButton.disabled = !algumSelecionado;
+            };
+    
+            // Adiciona o evento de mudança nos checkboxes
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function () {
+                    verificarSelecao();
+                });
+            });
+    
+            // Evento de clique no botão "Editar"
+            editarButton.addEventListener('click', function () {
+                // Obtém o checkbox selecionado
+                const selecionado = Array.from(checkboxes).find(checkbox => checkbox.checked);
+                if (selecionado) {
+                    const pessoaId = selecionado.value;
+    
+                    // Faz a requisição à API
+                    const url = `/get-option/${pessoaId}/`;
+
+                    fetch(url)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Erro ao buscar os dados: ' + response.status);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+
+                            // Preenchendo os campos do modal
+                            document.querySelector('#edit_option_id').value = data.id;
+                            document.querySelector('#edit_first_name').value = data.first_name;
+                            document.querySelector('#edit_last_name').value = data.last_name;
+                            document.querySelector('#edit_shift').value = data.shift_id;
+                            document.querySelector('#edit_company').value = data.company_id;
+                            document.querySelector('#edit_profile').value = data.profile_id;
+                            document.querySelector('#edit_birth_date').value = data.birth_date;
+
+                            // Mostrando o modal
+                            const modal =  new bootstrap.Modal(document.getElementById('#editModal'));
+                            modal.show();
+                        })
+                        .catch(error => {
+                            console.error('Erro ao chamar a API:', error);
+                        });
+                } else {
+                    console.warn('Nenhum checkbox está selecionado.');
+                }
+            });
+        });
+    </script>
+    
+    
+
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const checkboxes = document.querySelectorAll('.select-row');
+            const deleteButton = document.querySelector('#delete-button');
+            const confirmDeleteButton = document.querySelector('#confirm-delete');
+            let selectedoptionIds = [];
+        
+            // Inicialmente desabilita o botão
+            deleteButton.disabled = true;
+        
+            // Função para verificar se algum checkbox está selecionado
+            const verificarSelecao = () => {
+                selectedoptionIds = Array.from(checkboxes)
+                    .filter(checkbox => checkbox.checked)
+                    .map(checkbox => checkbox.value);
+                
+                deleteButton.disabled = selectedoptionIds.length === 0;
+            };
+        
+            // Adiciona o evento de mudança nos checkboxes
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', verificarSelecao);
+            });
+        
+            // Abre o modal de confirmação quando o botão Excluir for clicado
+            deleteButton.addEventListener('click', function () {
+                if (selectedoptionIds.length > 0) {
+                    // Exibe o modal de confirmação
+                    const modal =  new bootstrap.Modal(document.getElementById('#deleteModal'));
+                    modal.show();
+                }
+            });
+        
+            // Quando o botão de confirmação de exclusão for clicado
+            confirmDeleteButton.addEventListener('click', function () {
+                if (selectedoptionIds.length > 0) {
+                    // Fazer a requisição para excluir os funcionários
+                    fetch('/delete-options/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            option_ids: selectedoptionIds,
+                        }),
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Erro ao excluir os colaboradores');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Se a exclusão for bem-sucedida, recarrega a página
+                        location.reload();
+                    })
+                    .catch(error => {
+                        console.error('Erro:', error);
+                    });
+                }
+            });
+        });
+        
+        
+    </script>
+    
+
+{% endblock content %}

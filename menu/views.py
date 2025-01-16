@@ -289,3 +289,127 @@ def delete_employee(request):
                 return JsonResponse({'error': str(e)}, status=400)
         return JsonResponse({'error': 'Nenhum colaborador selecionado'}, status=400)
 
+
+@user_has_rh_profile
+@login_required
+def weekly_menu(request):
+    week_menu = WeekMenu.objects.prefetch_related('userchoice_set').all()
+    length_options_week_menu = []
+    options_week_menu = []
+    options = Options.objects.filter()
+
+    for menu in week_menu:
+        length_options_week_menu.append(len(menu.options.all()))
+        options_week_menu.append(menu.options.all())
+
+    # Passando o valor para o template (exemplo, primeira opção de segunda-feira)
+    options_monday = [option for option in options_week_menu[0] ]
+    options_tuesday = [option for option in options_week_menu[1] ]
+    options_wednesday = [option for option in options_week_menu[2] ]
+    options_thursday = [option for option in options_week_menu[3] ]
+    options_friday = [option for option in options_week_menu[4] ]
+
+
+    return render(request, 'menu/pages/weekly_menu.html', context= {
+        'week_menu': week_menu,
+        'options_week_menu': length_options_week_menu,
+        'options_monday': options_monday, 
+        'options_tuesday': options_tuesday, 
+        'options_wednesday': options_wednesday, 
+        'options_thursday': options_thursday, 
+        'options_friday': options_friday, 
+        'options': options,
+    })
+
+
+
+@user_has_rh_profile
+@login_required
+def update_weekly_menu(request):
+
+    def get_options(day):
+        return [
+            value for key, value in request.POST.items()
+            if key.startswith(f"{day}-option-")
+        ]
+    
+    if request.method == 'POST':
+        semana = [
+            (1, request.POST.get('prato_principal_segunda'), request.POST.get('guarnicao_segunda'), request.POST.get('data_segunda'), request.FILES.get('foto_segunda'), request.POST.get('qt_opcoes_segunda'), get_options('segunda')),
+            (2, request.POST.get('prato_principal_terca'), request.POST.get('guarnicao_terca'), request.POST.get('data_terca'), request.FILES.get('foto_terca'), request.POST.get('qt_opcoes_terca'), get_options('terca')),
+            (3, request.POST.get('prato_principal_quarta'), request.POST.get('guarnicao_quarta'), request.POST.get('data_quarta'), request.FILES.get('foto_quarta'), request.POST.get('qt_opcoes_quarta'), get_options('quarta')),
+            (4, request.POST.get('prato_principal_quinta'), request.POST.get('guarnicao_quinta'), request.POST.get('data_quinta'), request.FILES.get('foto_quinta'), request.POST.get('qt_opcoes_quinta'), get_options('quinta')),
+            (5, request.POST.get('prato_principal_sexta'), request.POST.get('guarnicao_sexta'), request.POST.get('data_sexta'), request.FILES.get('foto_sexta'), request.POST.get('qt_opcoes_sexta'), get_options('sexta')),
+        ]
+
+        try:
+            for day, dish, side_dish, date_meal, image_meal, qt_options, options_list in semana:
+                menu_item = WeekMenu.objects.filter(id=day).first()
+                if not menu_item:
+                    messages.error(request, f"Dia {day} não encontrado no cardápio.")
+                    continue
+
+                # Atualizar campos simples
+                menu_item.title = dish
+                menu_item.side_dish = side_dish
+                menu_item.date_meal = date_meal
+
+                # Tratamento da imagem
+                if image_meal:
+                    if not image_meal.content_type.startswith('image/'):
+                        messages.error(request, f"Arquivo enviado para o dia {day} não é uma imagem válida.")
+                        continue
+                    if image_meal.size > 5 * 1024 * 1024:  # Limite de 5MB
+                        messages.error(request, f"A imagem enviada para o dia {day} excede o tamanho permitido de 5MB.")
+                        continue
+                    menu_item.image_meal = image_meal
+                    
+
+                # Atualizar ManyToManyField com IDs de opções
+                if options_list:
+                    menu_item.options.set(options_list)
+
+                menu_item.save()
+
+            messages.success(request, "Cardápio atualizado com sucesso.")
+        except Exception as e:
+            messages.error(request, f"Ocorreu um erro ao atualizar o cardápio: {str(e)}")
+
+        return redirect('menu:weekly_menu')
+
+    return redirect('menu:weekly_menu')
+
+
+
+
+@login_required
+@user_has_rh_profile  # Restringe o acesso a usuários com perfil RH
+def options_page(request):
+
+# Obter filtros do GET
+    search = request.GET.get('search', '')  # Nome do campo no formulário é "search"
+    
+    # Querysets para filtros e colaboradores
+    options = Options.objects.all()
+    
+    # Filtragem da lista de colaboradores
+    options_list = Options.objects.all()
+
+    if search:
+        options_list = options_list.filter(name_option__icontains=search)
+
+    # Paginação
+    paginator = Paginator(options_list, 10)  # Exibe 10 colaboradores por página
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    # Renderizar template com contexto
+    return render(
+        request,
+        'menu/pages/options.html',
+        context={
+            'options': options,
+            'request': request,  # Passa request para o template (opcional, para reutilizar filtros)
+        }
+    )
+

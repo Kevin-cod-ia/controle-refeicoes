@@ -23,10 +23,7 @@ class WeekMenu(models.Model):
     image_meal = models.ImageField(upload_to='menu/week_menu/%Y/%m/%d/', blank=True, default='', verbose_name='Foto do prato')
     created_at = models.DateTimeField(auto_now_add=True)
 
-    name_option_1 = models.ForeignKey(Options, on_delete=models.CASCADE, related_name='weekmenu_option_1', verbose_name='Opção 1')
-    name_option_2 = models.ForeignKey(Options, on_delete=models.CASCADE, related_name='weekmenu_option_2', verbose_name='Opção 2')
-    name_option_3 = models.ForeignKey(Options, on_delete=models.CASCADE, related_name='weekmenu_option_3', verbose_name='Opção 3')
-
+    options = models.ManyToManyField(Options, related_name='weekmenu_options', verbose_name='Opções')
 
     class Meta:
         verbose_name = "Cardápio semanal"
@@ -35,9 +32,8 @@ class WeekMenu(models.Model):
     def __str__(self):
         # Configurar localidade compatível com Windows
         locale.setlocale(locale.LC_TIME, 'Portuguese_Brazil')
-        return self.date_meal.strftime("%A")
+        return f'{self.date_meal.strftime("%A")}'
     
-
 
 
 
@@ -104,7 +100,7 @@ class Employee(models.Model):
             self.user = user
         
         super().save(*args, **kwargs)  # Salva o Employee normalmente
-
+    
     
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
@@ -137,3 +133,12 @@ class UserChoice(models.Model):
     def __str__(self):
         return f"{self.user} - {self.menu}"
 
+
+
+class MenuOption(models.Model):
+    menu = models.ForeignKey(WeekMenu, on_delete=models.CASCADE)
+    option = models.ForeignKey(Options, on_delete=models.CASCADE)
+    order = models.PositiveIntegerField()  # Armazena a posição/ordem da opção
+
+    class Meta:
+        ordering = ['order']
