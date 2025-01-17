@@ -80,6 +80,7 @@ class Employee(models.Model):
     shift = models.ForeignKey(Shift, on_delete=models.CASCADE, related_name='employee_shift', verbose_name='Turno')
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='employee_company', verbose_name='Empresa')
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='employee_profile', verbose_name='Perfil')
+    is_on_vacations = models.BooleanField(default=False, verbose_name='Férias')
     user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='Usuário', null=True, blank=True)
 
     class Meta:

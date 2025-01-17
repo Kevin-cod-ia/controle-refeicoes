@@ -1,0 +1,78 @@
+{% extends "global/base.html" %}
+{% load menu_filters %}
+
+{% block title %}Relatório Faturamento{% endblock title %}
+
+
+
+{% block content %}
+    <!-- Título Principal -->
+    <div class="text-center my-3">
+        <h1 id="titulo_home" class="text-success-75">Relatório Faturamento</i></h1>
+        <p>Correspondente ao período 30/12 à 03/01</p>
+
+        <h3>FATURAMENTO 30.12.2024 A 03.01.2025</h3>
+        <table class="table table-bordered mt-3">
+            <thead>
+                <tr>
+                    <th>Empresa</th>
+                    <th>Qt. opções</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Empresa A</td>
+                    <td>10</td>
+                </tr>
+                <tr>
+                    <td>Empresa B</td>
+                    <td>20</td>
+                </tr>
+                <tr>
+                    <td>Empresa C</td>
+                    <td>15</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3 class="text-center my-3" >FATURAMENTO (ENTREGA) 30.12.2024 A 03.01.2025</h3>
+        <table class="table table-bordered mt-3">
+            <thead>
+                <tr>
+                    <th>Unidade</th>
+                    <th>Almoço</th>
+                    <th>Qt. opções</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Unidade A</td>
+                    <td>Sim</td>
+                    <td>30</td>
+                </tr>
+                <tr>
+                    <td>Unidade B</td>
+                    <td>Não</td>
+                    <td>25</td>
+                </tr>
+                <tr>
+                    <td>Unidade C</td>
+                    <td>Sim</td>
+                    <td>40</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="mt-4">
+            <label class="form-label fw-bold">Total</label>
+            <div><span class="fw-bold">128</span></div>
+        </div>
+
+        <div class="mt-5">
+            <button class="btn btn-success">Gerar relatório completo</button>
+        </div>
+    </div>
+
+
+
+{% endblock content %}

@@ -19,6 +19,11 @@ urlpatterns = [
     path('get-employee/<int:employee_id>/', views.get_employee, name='get_employee'),
     path('update-weekly-menu', views.update_weekly_menu, name='update_weekly_menu'),
     path('options/', views.options_page, name='options_page'),
+    path('create-option/', views.create_option, name='create_option'),
+    path('get-option/<int:option_id>/', views.get_options, name='get_options'),
+    path('reports/', views.reports_page, name='reports_page'),
+    path('edit-option/', views.edit_option, name='edit_option'),
+    path('delete-options/', views.delete_option, name='delete_option'),
 ]
 
 

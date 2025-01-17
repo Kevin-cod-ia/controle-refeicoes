@@ -146,6 +146,7 @@
                             document.querySelector('#edit_company').value = data.company_id;
                             document.querySelector('#edit_profile').value = data.profile_id;
                             document.querySelector('#edit_birth_date').value = data.birth_date;
+                            document.querySelector('#edit_vacation').checked = data.is_on_vacations;
 
                             // Mostrando o modal
                             const modal =  new bootstrap.Modal(document.getElementById('#editEmployeeModal'));
@@ -161,8 +162,6 @@
         });
     </script>
     
-    
-
     <script>
 
         document.addEventListener('DOMContentLoaded', function () {
@@ -230,5 +229,7 @@
         
     </script>
     
+   
 
+    
 {% endblock content %}

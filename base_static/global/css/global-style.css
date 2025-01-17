@@ -248,3 +248,33 @@ body{
   flex-wrap: wrap; /* Permite que as opções quebrem para a próxima linha */
   gap: 10px; /* Espaço entre os elementos */
 }
+
+
+
+/* Estilo específico para o pop-up de confirmação */
+.confirmation-popup-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5); /* Tela escurecida */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* Garante que fique sobre outros elementos */
+}
+
+.confirmation-popup-box {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+}
+
+button {
+  margin: 5px;
+}

@@ -16,7 +16,7 @@
         <form method="get" action="" class="mb-3">
             <div class="d-flex justify-content-between align-items-center">
                 <div class="input-group" style="max-width: 400px;">
-                    <input type="text" name="search" class="form-control" placeholder="Pesquisar por nome" value="{{ request.GET.search }}">
+                    <input type="text" name="search" class="form-control" placeholder="Pesquisar opção" value="{{ request.GET.search }}">
                     <button class="btn btn-outline-secondary" type="submit">🔍</button>
                 </div>
             </div>
@@ -54,7 +54,7 @@
         data-bs-target="#editModal" >
             Editar
         </button>
-        <button id='delete-button' class="btn btn-danger me-2" 
+        <button id="delete-button" class="btn btn-danger me-2" 
         data-bs-toggle="modal" 
         data-bs-target="#deleteModal">
             Excluir
@@ -62,11 +62,9 @@
     </div>
 
 
-
-    {% comment %} {% include "menu/partials/_modal_create_user.html" %}
-    {% include "menu/partials/_modal_update_user.html" %}
-    {% include "menu/partials/_modal_delete_user.html" %} {% endcomment %}
-
+    {% include "menu/partials/_modal_create.html" %}
+    {% include "menu/partials/_modal_delete.html" %} 
+    {% include "menu/partials/_modal_update.html" %} 
 
     <script>
         // Script para selecionar/desmarcar todas as linhas
@@ -105,10 +103,10 @@
                 // Obtém o checkbox selecionado
                 const selecionado = Array.from(checkboxes).find(checkbox => checkbox.checked);
                 if (selecionado) {
-                    const pessoaId = selecionado.value;
+                    const opcaoId = selecionado.value;
     
                     // Faz a requisição à API
-                    const url = `/get-option/${pessoaId}/`;
+                    const url = `/get-option/${opcaoId}/`;
 
                     fetch(url)
                         .then(response => {
@@ -121,12 +119,7 @@
 
                             // Preenchendo os campos do modal
                             document.querySelector('#edit_option_id').value = data.id;
-                            document.querySelector('#edit_first_name').value = data.first_name;
-                            document.querySelector('#edit_last_name').value = data.last_name;
-                            document.querySelector('#edit_shift').value = data.shift_id;
-                            document.querySelector('#edit_company').value = data.company_id;
-                            document.querySelector('#edit_profile').value = data.profile_id;
-                            document.querySelector('#edit_birth_date').value = data.birth_date;
+                            document.querySelector('#edit_name_option').value = data.name_option;
 
                             // Mostrando o modal
                             const modal =  new bootstrap.Modal(document.getElementById('#editModal'));
@@ -142,74 +135,85 @@
         });
     </script>
     
-    
 
     <script>
-
         document.addEventListener('DOMContentLoaded', function () {
             const checkboxes = document.querySelectorAll('.select-row');
             const deleteButton = document.querySelector('#delete-button');
             const confirmDeleteButton = document.querySelector('#confirm-delete');
-            let selectedoptionIds = [];
-        
+            let selectedOptionIds = [];
+    
             // Inicialmente desabilita o botão
             deleteButton.disabled = true;
-        
+    
             // Função para verificar se algum checkbox está selecionado
             const verificarSelecao = () => {
-                selectedoptionIds = Array.from(checkboxes)
+                selectedOptionIds = Array.from(checkboxes)
                     .filter(checkbox => checkbox.checked)
                     .map(checkbox => checkbox.value);
-                
-                deleteButton.disabled = selectedoptionIds.length === 0;
+    
+                deleteButton.disabled = selectedOptionIds.length === 0;
             };
-        
+    
             // Adiciona o evento de mudança nos checkboxes
             checkboxes.forEach(checkbox => {
                 checkbox.addEventListener('change', verificarSelecao);
             });
-        
+    
             // Abre o modal de confirmação quando o botão Excluir for clicado
             deleteButton.addEventListener('click', function () {
-                if (selectedoptionIds.length > 0) {
-                    // Exibe o modal de confirmação
-                    const modal =  new bootstrap.Modal(document.getElementById('#deleteModal'));
-                    modal.show();
+                // Fechar o modal de edição, se estiver aberto
+                const modal =  new bootstrap.Modal(document.getElementById('#deleteModal'));
+                if (editModal) {
+                    editModal.hide();
+                }
+    
+                // Abrir o modal de exclusão
+                if (selectedOptionIds.length > 0) {
+                    const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+                    deleteModal.show();
+                } else {
+                    console.warn('Nenhum checkbox selecionado.');
                 }
             });
-        
+    
             // Quando o botão de confirmação de exclusão for clicado
             confirmDeleteButton.addEventListener('click', function () {
-                if (selectedoptionIds.length > 0) {
-                    // Fazer a requisição para excluir os funcionários
+                if (selectedOptionIds.length > 0) {
+                    // Realizar requisição para excluir os itens
                     fetch('/delete-options/', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({
-                            option_ids: selectedoptionIds,
+                            option_ids: selectedOptionIds,
                         }),
                     })
                     .then(response => {
                         if (!response.ok) {
-                            throw new Error('Erro ao excluir os colaboradores');
+                            throw new Error('Erro ao excluir as opções');
                         }
                         return response.json();
                     })
                     .then(data => {
-                        // Se a exclusão for bem-sucedida, recarrega a página
-                        location.reload();
+                        if (data.message) {
+                            location.reload();
+                        } else {
+                            console.warn('Nenhuma mensagem de sucesso recebida:', data);
+                        }
                     })
                     .catch(error => {
-                        console.error('Erro:', error);
+                        console.error('Erro na requisição:', error);
                     });
+                } else {
+                    console.warn('Nenhum ID selecionado para exclusão.');
                 }
             });
         });
-        
-        
     </script>
+    
+
     
 
 {% endblock content %}

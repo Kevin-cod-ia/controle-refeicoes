@@ -175,6 +175,7 @@ def create_employee(request):
         shift_id = request.POST.get('shift')
         company_id = request.POST.get('company')
         profile_id = request.POST.get('profile')
+        vacation = request.POST.get('vacation') == 'on'
 
         # Valida se todos os campos obrigatórios foram preenchidos
         if not all([first_name, last_name, birth_date_str, shift_id, company_id, profile_id]):
@@ -197,7 +198,8 @@ def create_employee(request):
                 birth_date=birth_date,
                 shift=shift,
                 company=company,
-                profile=profile
+                profile=profile,
+                is_on_vacations=vacation,
             )
 
             # Mensagem de sucesso
@@ -233,6 +235,7 @@ def get_employee(request, employee_id):
             'company_id': employee.company.id,
             'profile_id': employee.profile.id,
             'birth_date': employee.birth_date.strftime('%Y-%m-%d'),
+            'is_on_vacations': employee.is_on_vacations,
         }
         
         return JsonResponse(data)
@@ -250,10 +253,11 @@ def edit_employee(request):
             employee = Employee.objects.get(id=employee_id)
             employee.first_name = request.POST.get('first_name')
             employee.last_name = request.POST.get('last_name')
-            employee.shift_id = request.POST.get('shift')  # Ajuste se necessário
-            employee.company_id = request.POST.get('company')  # Ajuste se necessário
-            employee.profile_id = request.POST.get('profile')  # Ajuste se necessário
-            birth_date_str = request.POST.get('birth_date')  # Recebido como string
+            employee.shift_id = request.POST.get('shift') 
+            employee.company_id = request.POST.get('company') 
+            employee.profile_id = request.POST.get('profile') 
+            employee.is_on_vacations = request.POST.get('vacation') == 'on'
+            birth_date_str = request.POST.get('birth_date')  
 
             employee.birth_date = datetime.strptime(birth_date_str, '%Y-%m-%d').date()
 
@@ -408,8 +412,117 @@ def options_page(request):
         request,
         'menu/pages/options.html',
         context={
-            'options': options,
+            'page_obj': options_list,
             'request': request,  # Passa request para o template (opcional, para reutilizar filtros)
         }
     )
+
+
+
+
+
+@login_required
+@user_has_rh_profile  # Restringe o acesso a usuários com perfil RH
+def create_option(request):
+    if request.method == 'POST':
+        name_option = request.POST.get('name_category')
+    
+
+        # Valida se todos os campos obrigatórios foram preenchidos
+        if not all([name_option]):
+            messages.error(request, "Todos os campos são obrigatórios.")
+            return redirect('menu:create_option')  # Ajuste para a URL correta
+
+        try:
+
+            # Cria o objeto Employee
+            option = Options.objects.create(
+                name_option=name_option,
+            )
+
+            # Mensagem de sucesso
+            messages.success(request, f"Opção {option.name_option} criada com sucesso.")
+            return redirect('menu:options_page')  # Ajuste para a URL correta
+
+
+        except Exception as e:
+            messages.error(request, f"Ocorreu um erro: {e}")
+            return redirect('menu:options_page') 
+
+    return redirect('menu:options_page')   # Ajuste para a URL correta
+
+
+
+@login_required
+@user_has_rh_profile  # Restringe o acesso a usuários com perfil RH
+def reports_page(request):
+    
+    weekly_menu = WeekMenu.objects.filter()
+    user_choices = UserChoice.objects.filter()
+
+    # Renderizar template com contexto
+    return render(
+        request,
+        'menu/pages/reports.html',
+        context={
+            'request': request,
+        }
+    )
+
+
+
+
+@user_has_rh_profile
+@login_required
+def get_options(request, option_id):
+    try:
+        option = get_object_or_404(Options, id=option_id)
+        data = {
+            'id': option.id,
+            'name_option': option.name_option,
+        }
+        
+        return JsonResponse(data)
+    except Options.DoesNotExist:
+        return JsonResponse({'error': 'Opção não encontrada'}, status=404)
+
+
+
+
+@user_has_rh_profile
+@login_required
+def edit_option(request):
+    if request.method == 'POST':
+        option_id = request.POST.get('option_id')
+        try:
+            option = Options.objects.get(id=option_id)
+            option.name_option = request.POST.get('name_option')
+            option.save()
+
+            messages.success(request, "Opção editada com sucesso.")
+        except Employee.DoesNotExist:
+            messages.error(request, "Opção não encontrada.")
+        return redirect('menu:options_page')
+    return redirect('menu:options_page')
+
+
+
+@user_has_rh_profile
+@csrf_exempt
+@login_required
+def delete_option(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)  # Obtém os dados enviados no corpo da requisição
+            option_ids = data.get('option_ids', [])  # IDs das opções selecionadas
+
+            if option_ids:
+                # Deleta as opções com os IDs fornecidos
+                Options.objects.filter(id__in=option_ids).delete()
+                return JsonResponse({'message': 'Opções excluídas com sucesso!'}, status=200)
+            return JsonResponse({'error': 'Nenhuma opção selecionada.'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': f'Ocorreu um erro: {str(e)}'}, status=400)
+    return JsonResponse({'error': 'Método não permitido.'}, status=405)
+
 
