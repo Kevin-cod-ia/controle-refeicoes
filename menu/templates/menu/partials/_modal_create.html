@@ -3,15 +3,15 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header bg-success text-white">
-                <h5 class="modal-title" id="createModalLabel">Criar Opção</h5>
+                <h5 class="modal-title" id="createModalLabel">Criar {{ title_page_category }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form method="post" action="{% url "menu:create_option" %}">
+            <form method="post" action="{% url dynamic_url_name_create %}">
                 {% csrf_token %}
                 <div class="modal-body">
                     <!-- Primeira linha -->
                     <div class="row mb-3">
-                        <label for="name_category" class="form-label"> Opção </label>
+                        <label for="name_category" class="form-label"> {{ title_page_category }} </label>
                         <input type="text" id="name_category" name="name_category" class="form-control" required>
 
                     </div>

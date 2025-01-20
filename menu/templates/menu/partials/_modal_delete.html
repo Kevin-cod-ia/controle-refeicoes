@@ -7,9 +7,9 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                Tem certeza de que deseja excluir as opções selecionadas? 
+                {{ delete_message }}
                 <br>
-                <strong>Atenção:</strong> Todas as escolhas associadas a essas opções também serão excluídas.
+                <strong>Atenção:</strong> Todas as escolhas de cardápio associadas a {{ delete_warning }} também serão excluídas.
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>

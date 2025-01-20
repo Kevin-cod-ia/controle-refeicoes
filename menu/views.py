@@ -1,4 +1,5 @@
 import json
+from django.db.models import Count, Q
 from django.shortcuts import render, redirect, get_object_or_404 
 from .models import WeekMenu, Employee
 from datetime import datetime
@@ -9,8 +10,10 @@ from django.core.paginator import Paginator
 from .models import UserChoice, Options, Employee, Company, Shift, Profile
 import logging
 from utils.menu.decorators import user_has_rh_profile
+from utils.menu.report_functions import generate_full_report_function
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from collections import defaultdict
 
 
 logger = logging.getLogger(__name__)
@@ -119,6 +122,8 @@ def save_user_choices(request):
 
     return redirect('menu:home')
 
+
+# EMPLOYEE PAGE FUNCTIONS
 
 @login_required
 @user_has_rh_profile  # Restringe o acesso a usuários com perfil RH
@@ -385,6 +390,7 @@ def update_weekly_menu(request):
 
 
 
+# OPTIONS PAGE FUNCTIONS
 
 @login_required
 @user_has_rh_profile  # Restringe o acesso a usuários com perfil RH
@@ -392,7 +398,13 @@ def options_page(request):
 
 # Obter filtros do GET
     search = request.GET.get('search', '')  # Nome do campo no formulário é "search"
-    
+    title_page_category = 'Opção'
+    delete_message = 'Tem certeza de que deseja excluir as opções selecionadas? '
+    delete_warning = 'essas opções'
+    dynamic_url_name_create = f"menu:create_option"
+    dynamic_url_name_edit = f"menu:edit_option"
+    dynamic_url_name_delete = f"menu:delete_option"
+
     # Querysets para filtros e colaboradores
     options = Options.objects.all()
     
@@ -413,11 +425,15 @@ def options_page(request):
         'menu/pages/options.html',
         context={
             'page_obj': options_list,
+            'title_page_category': title_page_category,
+            'delete_message': delete_message,
+            'delete_warning': delete_warning,
+            'dynamic_url_name_create': dynamic_url_name_create,
+            'dynamic_url_name_edit': dynamic_url_name_edit,
+            'dynamic_url_name_delete': dynamic_url_name_delete,
             'request': request,  # Passa request para o template (opcional, para reutilizar filtros)
         }
     )
-
-
 
 
 
@@ -426,7 +442,6 @@ def options_page(request):
 def create_option(request):
     if request.method == 'POST':
         name_option = request.POST.get('name_category')
-    
 
         # Valida se todos os campos obrigatórios foram preenchidos
         if not all([name_option]):
@@ -453,24 +468,6 @@ def create_option(request):
 
 
 
-@login_required
-@user_has_rh_profile  # Restringe o acesso a usuários com perfil RH
-def reports_page(request):
-    
-    weekly_menu = WeekMenu.objects.filter()
-    user_choices = UserChoice.objects.filter()
-
-    # Renderizar template com contexto
-    return render(
-        request,
-        'menu/pages/reports.html',
-        context={
-            'request': request,
-        }
-    )
-
-
-
 
 @user_has_rh_profile
 @login_required
@@ -493,10 +490,10 @@ def get_options(request, option_id):
 @login_required
 def edit_option(request):
     if request.method == 'POST':
-        option_id = request.POST.get('option_id')
+        option_id = request.POST.get('category_id')
         try:
             option = Options.objects.get(id=option_id)
-            option.name_option = request.POST.get('name_option')
+            option.name_option = request.POST.get('name_category')
             option.save()
 
             messages.success(request, "Opção editada com sucesso.")
@@ -526,3 +523,377 @@ def delete_option(request):
     return JsonResponse({'error': 'Método não permitido.'}, status=405)
 
 
+
+# SHIFTS PAGE FUNCTIONS
+
+@login_required
+@user_has_rh_profile  # Restringe o acesso a usuários com perfil RH
+def shifts_page(request):
+
+# Obter filtros do GET
+    search = request.GET.get('search', '')  # Nome do campo no formulário é "search"
+    title_page_category = 'Turno'
+    delete_message = 'Tem certeza de que deseja excluir os turnos selecionados?'
+    delete_warning = 'esses turnos'
+    dynamic_url_name_create = f"menu:create_shift"
+    dynamic_url_name_edit = f"menu:edit_shift"
+    dynamic_url_name_delete = f"menu:delete_shift"
+
+    # Querysets para filtros e colaboradores
+    shifts = Shift.objects.all()
+    
+    # Filtragem da lista de colaboradores
+    shifts_list = Shift.objects.all()
+
+    if search:
+        shifts_list = shifts_list.filter(shift__icontains=search)
+
+    # Paginação
+    paginator = Paginator(shifts_list, 10)  # Exibe 10 colaboradores por página
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    # Renderizar template com contexto
+    return render(
+        request,
+        'menu/pages/shifts.html',
+        context={
+            'page_obj': shifts_list,
+            'title_page_category': title_page_category,
+            'delete_message': delete_message,
+            'delete_warning': delete_warning,
+            'dynamic_url_name_create': dynamic_url_name_create,
+            'dynamic_url_name_edit': dynamic_url_name_edit,
+            'dynamic_url_name_delete': dynamic_url_name_delete,
+            'request': request,  # Passa request para o template (opcional, para reutilizar filtros)
+        }
+    )
+
+
+
+@login_required
+@user_has_rh_profile  # Restringe o acesso a usuários com perfil RH
+def create_shift(request):
+    if request.method == 'POST':
+        name_shift = request.POST.get('name_category')
+    
+
+        # Valida se todos os campos obrigatórios foram preenchidos
+        if not all([name_shift]):
+            messages.error(request, "Todos os campos são obrigatórios.")
+            return redirect('menu:create_shift')  # Ajuste para a URL correta
+
+        try:
+
+            # Cria o objeto Employee
+            shift = Shift.objects.create(
+                shift=name_shift,
+            )
+
+            # Mensagem de sucesso
+            messages.success(request, f"Turno {shift.shift} criada com sucesso.")
+            return redirect('menu:shifts_page')  # Ajuste para a URL correta
+
+
+        except Exception as e:
+            messages.error(request, f"Ocorreu um erro: {e}")
+            return redirect('menu:shifts_page') 
+
+    return redirect('menu:shifts_page')   # Ajuste para a URL correta
+
+
+
+@user_has_rh_profile
+@login_required
+def get_shifts(request, shift_id):
+    try:
+        shift = get_object_or_404(Shift, id=shift_id)
+        data = {
+            'id': shift.id,
+            'shift': shift.shift,
+        }
+        
+        return JsonResponse(data)
+    except Shift.DoesNotExist:
+        return JsonResponse({'error': 'Turno não encontrado'}, status=404)
+
+
+
+@user_has_rh_profile
+@login_required
+def edit_shift(request):
+    if request.method == 'POST':
+        shift_id = request.POST.get('category_id')
+        
+        try:
+            shift = Shift.objects.get(id=shift_id)
+            shift.shift = request.POST.get('name_category')
+
+            shift.save()
+
+            messages.success(request, "Turno editado com sucesso.")
+        except Employee.DoesNotExist:
+            messages.error(request, "Turno não encontrado.")
+        return redirect('menu:shifts_page')
+    return redirect('menu:shifts_page')
+
+
+@user_has_rh_profile
+@csrf_exempt
+@login_required
+def delete_shift(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)  # Obtém os dados enviados no corpo da requisição
+            shift_ids = data.get('shift_ids', [])  # IDs das opções selecionadas
+
+            if shift_ids:
+                # Deleta as opções com os IDs fornecidos
+                Shift.objects.filter(id__in=shift_ids).delete()
+                return JsonResponse({'message': 'Turnos excluídos com sucesso!'}, status=200)
+            return JsonResponse({'error': 'Nenhum turno selecionado.'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': f'Ocorreu um erro: {str(e)}'}, status=400)
+    return JsonResponse({'error': 'Método não permitido.'}, status=405)
+
+
+
+
+# COMPANIES PAGE FUNCTIONS
+
+@login_required
+@user_has_rh_profile  # Restringe o acesso a usuários com perfil RH
+def companies_page(request):
+
+# Obter filtros do GET
+    search = request.GET.get('search', '')  # Nome do campo no formulário é "search"
+    title_page_category = 'Empresa'
+    delete_message = 'Tem certeza de que deseja excluir as empresas selecionadas?'
+    delete_warning = 'essas empresas'
+    dynamic_url_name_create = f"menu:create_company"
+    dynamic_url_name_edit = f"menu:edit_company"
+    dynamic_url_name_delete = f"menu:delete_company"
+
+    # Querysets para filtros e colaboradores
+    companies = Company.objects.all()
+    
+    # Filtragem da lista de colaboradores
+    companies_list = Company.objects.all()
+
+    if search:
+        companies_list = companies_list.filter(company_name__icontains=search)
+
+    # Paginação
+    paginator = Paginator(companies_list, 10)  # Exibe 10 colaboradores por página
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    # Renderizar template com contexto
+    return render(
+        request,
+        'menu/pages/companies.html',
+        context={
+            'page_obj': companies_list,
+            'title_page_category': title_page_category,
+            'delete_message': delete_message,
+            'delete_warning': delete_warning,
+            'dynamic_url_name_create': dynamic_url_name_create,
+            'dynamic_url_name_edit': dynamic_url_name_edit,
+            'dynamic_url_name_delete': dynamic_url_name_delete,
+            'request': request,  # Passa request para o template (opcional, para reutilizar filtros)
+        }
+    )
+
+
+
+
+@login_required
+@user_has_rh_profile  # Restringe o acesso a usuários com perfil RH
+def create_company(request):
+    if request.method == 'POST':
+        name_company = request.POST.get('name_category')
+    
+
+        # Valida se todos os campos obrigatórios foram preenchidos
+        if not all([name_company]):
+            messages.error(request, "Todos os campos são obrigatórios.")
+            return redirect('menu:create_company')  # Ajuste para a URL correta
+
+        try:
+
+            # Cria o objeto Employee
+            company = Company.objects.create(
+                company_name=name_company,
+            )
+
+            # Mensagem de sucesso
+            messages.success(request, f"Empresa {company.company_name} criada com sucesso.")
+            return redirect('menu:companies_page')  # Ajuste para a URL correta
+
+
+        except Exception as e:
+            messages.error(request, f"Ocorreu um erro: {e}")
+            return redirect('menu:companies_page') 
+
+    return redirect('menu:companies_page')   # Ajuste para a URL correta
+
+
+
+
+@user_has_rh_profile
+@login_required
+def get_companies(request, company_id):
+    try:
+        company = get_object_or_404(Company, id=company_id)
+        data = {
+            'id': company.id,
+            'company': company.company_name,
+        }
+        
+        return JsonResponse(data)
+    except Company.DoesNotExist:
+        return JsonResponse({'error': 'Empresa não encontrada'}, status=404)
+
+
+
+
+@user_has_rh_profile
+@login_required
+def edit_company(request):
+    if request.method == 'POST':
+        company_id = request.POST.get('category_id')
+        
+        try:
+            company = Company.objects.get(id=company_id)
+            company.company_name = request.POST.get('name_category')
+
+            company.save()
+
+            messages.success(request, "Empresa editada com sucesso.")
+        except Employee.DoesNotExist:
+            messages.error(request, "Empresa não encontrada.")
+        return redirect('menu:companies_page')
+    return redirect('menu:companies_page')
+
+
+
+@user_has_rh_profile
+@csrf_exempt
+@login_required
+def delete_company(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)  # Obtém os dados enviados no corpo da requisição
+            company_ids = data.get('company_ids', [])  # IDs das empresas selecionadas
+
+            if company_ids:
+                # Deleta as empresas com os IDs fornecidos
+                Company.objects.filter(id__in=company_ids).delete()
+                return JsonResponse({'message': 'Empresas excluídas com sucesso!'}, status=200)
+            return JsonResponse({'error': 'Nenhuma empresa selecionado.'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': f'Ocorreu um erro: {str(e)}'}, status=400)
+    return JsonResponse({'error': 'Método não permitido.'}, status=405)
+
+
+
+
+
+
+
+@login_required
+@user_has_rh_profile  # Restringe o acesso a usuários com perfil RH
+def reports_page(request):
+    
+    weekly_menu = WeekMenu.objects.filter()
+    user_choices = UserChoice.objects.select_related('user', 'menu', 'option').all()
+    companies = Company.objects.filter()
+    employees = Employee.objects.filter()
+
+    choices_by_company = (
+        Employee.objects
+        .values('company__company_name')  # Agrupa por empresa
+        .annotate(
+            total_options=Count(
+                'user__userchoice__option', 
+                filter=Q(user__userchoice__isnull=False)
+            )
+        )  # Conta as opções ou retorna 0 se não houver
+        .order_by('company__company_name')  # Ordena pelo nome da empresa
+    )
+
+    # Obter o total de funcionários não de férias por empresa
+    employees_no_vacation = (
+        Employee.objects
+        .values('company__company_name')  # Agrupa por empresa
+        .annotate(
+            employees_no_vacation_total=Count(
+                'id',
+                filter=Q(is_on_vacations=False)
+            )
+        )
+        .order_by('company__company_name')  # Ordena pelo nome da empresa
+    )
+
+
+    # Classificar empresas por unidade de entrega
+    UNIT_MAPPING = {
+        'Unidade 01 - Rua João Jose dos Reis, 59': ['FG&P', 'FCD'],
+        'Unidade 02 - Rua Jose Maria de Melo, 311': ['Sustenpack - Unidade 2'],
+        'Unidade 05 (GALPÃO NOVO) - Rua Jose Maria de Melo, 157': ['Sustenpack'],
+    }
+
+    # Contabilizar funcionários por unidade de entrega
+    employees_by_unit = {}
+    for unit, companies in UNIT_MAPPING.items():
+        employees_by_unit[unit] = Employee.objects.filter(
+            company__company_name__in=companies,
+            is_on_vacations=False  # Apenas funcionários não de férias
+        ).count()
+
+
+    # Juntar os resultados em um único dicionário
+    company_data = {}
+    for choice in choices_by_company:
+        company_name = choice['company__company_name']
+        company_data[company_name] = {
+            'total_options': choice['total_options'],
+            'employees_no_vacation_total': 0,  # Valor padrão
+        }
+
+    for employee in employees_no_vacation:
+        company_name = employee['company__company_name']
+        if company_name in company_data:
+            company_data[company_name]['employees_no_vacation_total'] = employee['employees_no_vacation_total']
+        else:
+            company_data[company_name] = {
+                'total_options': 0,  # Caso não tenha opções associadas
+                'employees_no_vacation_total': employee['employees_no_vacation_total'],
+            }
+
+    total_employees_by_unit = sum(employees_by_unit.values())
+
+    # Renderizar template com contexto
+    return render(
+        request,
+        'menu/pages/reports.html',
+        context={
+            'weekly_menu': weekly_menu,
+            'company_data': company_data,
+            'employees_by_unit': employees_by_unit,
+            'total_employees_by_unit': total_employees_by_unit,
+            'request': request,
+        }
+    )
+
+
+
+
+
+@user_has_rh_profile
+@login_required
+def generate_full_report_button(request):
+    companies = Company.objects.filter()
+
+    return generate_full_report_function(request, companies)
+    

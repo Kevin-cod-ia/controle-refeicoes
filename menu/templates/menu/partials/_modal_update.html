@@ -2,16 +2,16 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header bg-success text-white">
-                <h5 class="modal-title" id="editModalLabel">Editar Opção</h5>
+                <h5 class="modal-title" id="editModalLabel">Editar {{ title_page_category }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="editForm" method="post" action="{% url "menu:edit_option" %}">
+            <form method="post" action="{% url dynamic_url_name_edit %}">
                 {% csrf_token %}
                 <div class="modal-body">
-                    <input type="hidden" name="option_id" id="edit_option_id">
+                    <input type="hidden" name="category_id" id="edit_category_id">
                     <div class="mb-3">
-                        <label for="edit_name_option" class="form-label">Opção</label>
-                        <input type="text" class="form-control" id="edit_name_option" name="name_option" required>
+                        <label for="edit_name" class="form-label">{{ title_page_category }}</label>
+                        <input type="text" class="form-control" id="edit_name" name="name_category" required>
                     </div>          
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>

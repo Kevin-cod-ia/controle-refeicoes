@@ -2,21 +2,21 @@
 {% load menu_filters %}
 
 
-{% block title %}Opções{% endblock title %}
+{% block title %}Empresas{% endblock title %}
 
 {% block content %}
 
     <div class="container">
         <!-- Título -->
         <div class="text-center my-3">
-            <h1 id="titulo_home" class="text-success-75">Opções</h1>
+            <h1 id="titulo_home" class="text-success-75">Empresas</h1>
         </div>
 
         <!-- Filtros e Paginação -->
         <form method="get" action="" class="mb-3">
             <div class="d-flex justify-content-between align-items-center">
                 <div class="input-group" style="max-width: 400px;">
-                    <input type="text" name="search" class="form-control" placeholder="Pesquisar opção" value="{{ request.GET.search }}">
+                    <input type="text" name="search" class="form-control" placeholder="Pesquisar empresa" value="{{ request.GET.search }}">
                     <button class="btn btn-outline-secondary" type="submit">🔍</button>
                 </div>
             </div>
@@ -28,14 +28,14 @@
                 <thead class="table-secondary">
                     <tr>
                         <th><input type="checkbox" id="select-all"></th>
-                        <th>Opção</th>
+                        <th>Empresa</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for option in page_obj %}
+                    {% for company in page_obj %}
                         <tr>
-                            <td><input type="checkbox" class="select-row" value='{{ option.id }}'></td>
-                            <td>{{ option.name_option }}</td>
+                            <td><input type="checkbox" class="select-row" value='{{ company.id }}'></td>
+                            <td>{{ company.company_name }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -103,10 +103,10 @@
                 // Obtém o checkbox selecionado
                 const selecionado = Array.from(checkboxes).find(checkbox => checkbox.checked);
                 if (selecionado) {
-                    const opcaoId = selecionado.value;
+                    const empresaId = selecionado.value;
     
                     // Faz a requisição à API
-                    const url = `/get-option/${opcaoId}/`;
+                    const url = `/get-company/${empresaId}/`;
 
                     fetch(url)
                         .then(response => {
@@ -119,7 +119,7 @@
 
                             // Preenchendo os campos do modal
                             document.querySelector('#edit_category_id').value = data.id;
-                            document.querySelector('#edit_name').value = data.name_option;
+                            document.querySelector('#edit_name').value = data.company;
 
                             // Mostrando o modal
                             const modal =  new bootstrap.Modal(document.getElementById('#editModal'));
@@ -141,18 +141,18 @@
             const checkboxes = document.querySelectorAll('.select-row');
             const deleteButton = document.querySelector('#delete-button');
             const confirmDeleteButton = document.querySelector('#confirm-delete');
-            let selectedOptionIds = [];
+            let selectedCompanytIds = [];
     
             // Inicialmente desabilita o botão
             deleteButton.disabled = true;
     
             // Função para verificar se algum checkbox está selecionado
             const verificarSelecao = () => {
-                selectedOptionIds = Array.from(checkboxes)
+                selectedCompanytIds = Array.from(checkboxes)
                     .filter(checkbox => checkbox.checked)
                     .map(checkbox => checkbox.value);
     
-                deleteButton.disabled = selectedOptionIds.length === 0;
+                deleteButton.disabled = selectedCompanytIds.length === 0;
             };
     
             // Adiciona o evento de mudança nos checkboxes
@@ -169,7 +169,7 @@
                 }
     
                 // Abrir o modal de exclusão
-                if (selectedOptionIds.length > 0) {
+                if (selectedCompanytIds.length > 0) {
                     const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
                     deleteModal.show();
                 } else {
@@ -179,20 +179,20 @@
     
             // Quando o botão de confirmação de exclusão for clicado
             confirmDeleteButton.addEventListener('click', function () {
-                if (selectedOptionIds.length > 0) {
+                if (selectedCompanytIds.length > 0) {
                     // Realizar requisição para excluir os itens
-                    fetch('/delete-options/', {
+                    fetch('/delete-companies/', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({
-                            option_ids: selectedOptionIds,
+                            company_ids: selectedCompanytIds,
                         }),
                     })
                     .then(response => {
                         if (!response.ok) {
-                            throw new Error('Erro ao excluir as opções');
+                            throw new Error('Erro ao excluir as empresas');
                         }
                         return response.json();
                     })
