@@ -34,6 +34,14 @@
                         </select>
                     </div>
                     <div class="mb-3">
+                        <label for="edit_unity" class="form-label">Unidade de refeição</label>
+                        <select class="form-select" id="edit_unity" name="unity" required>
+                            {% for unity in units %}
+                            <option value="{{ unity.id }}">{{ unity.unity_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
                         <label for="edit_profile" class="form-label">Perfil</label>
                         <select class="form-select" id="edit_profile" name="profile" required>
                             {% for profile in profiles %}

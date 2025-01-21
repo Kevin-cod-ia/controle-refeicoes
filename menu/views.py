@@ -1,7 +1,7 @@
 import json
 from django.db.models import Count, Q
 from django.shortcuts import render, redirect, get_object_or_404 
-from .models import WeekMenu, Employee
+from .models import WeekMenu, Employee, Unity
 from datetime import datetime
 from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login,logout as auth_logout
@@ -133,11 +133,13 @@ def employees_page(request):
     search = request.GET.get('search', '')  # Nome do campo no formulário é "search"
     shift = request.GET.get('shift', '')  # Nome do campo no formulário é "shift"
     company = request.GET.get('company', '')  # Nome do campo no formulário é "company"
+    unity = request.GET.get('unity', '')  # Nome do campo no formulário é "unity"
     
     # Querysets para filtros e colaboradores
     employees_company = Employee.objects.all()
     shifts_company = Shift.objects.all()
     companies = Company.objects.all()
+    units = Unity.objects.all()
     profiles = Profile.objects.all()
 
     # Filtragem da lista de colaboradores
@@ -149,6 +151,8 @@ def employees_page(request):
         employees_list = employees_list.filter(shift__shift=shift)  # Comparando com o nome do turno
     if company:
         employees_list = employees_list.filter(company__company_name=company)
+    if unity:
+        employees_list = employees_list.filter(unity__unity_name=unity)
 
     # Paginação
     paginator = Paginator(employees_list, 10)  # Exibe 10 colaboradores por página
@@ -163,6 +167,7 @@ def employees_page(request):
             'employees_company': employees_company,
             'shifts_company': shifts_company,
             'companies': companies,
+            'units': units,
             'page_obj': page_obj,
             'profiles': profiles,
             'request': request,  # Passa request para o template (opcional, para reutilizar filtros)
@@ -179,11 +184,12 @@ def create_employee(request):
         birth_date_str = request.POST.get('birth_date')  # Recebido como string
         shift_id = request.POST.get('shift')
         company_id = request.POST.get('company')
+        unity_id = request.POST.get('unity')
         profile_id = request.POST.get('profile')
         vacation = request.POST.get('vacation') == 'on'
 
         # Valida se todos os campos obrigatórios foram preenchidos
-        if not all([first_name, last_name, birth_date_str, shift_id, company_id, profile_id]):
+        if not all([first_name, last_name, birth_date_str, shift_id, company_id, unity_id, profile_id]):
             messages.error(request, "Todos os campos são obrigatórios.")
             return redirect('menu:employees_page')  # Ajuste para a URL correta
 
@@ -194,6 +200,7 @@ def create_employee(request):
             # Obtém os objetos relacionados de Turno, Empresa e Perfil
             shift = Shift.objects.get(id=shift_id)
             company = Company.objects.get(id=company_id)
+            unity = Unity.objects.get(id=unity_id)
             profile = Profile.objects.get(id=profile_id)
 
             # Cria o objeto Employee
@@ -203,6 +210,7 @@ def create_employee(request):
                 birth_date=birth_date,
                 shift=shift,
                 company=company,
+                unity=unity,
                 profile=profile,
                 is_on_vacations=vacation,
             )
@@ -216,7 +224,7 @@ def create_employee(request):
             return redirect('menu:employees_page')
 
         except (Shift.DoesNotExist, Company.DoesNotExist, Profile.DoesNotExist):
-            messages.error(request, "Erro ao buscar turno, empresa ou perfil.")
+            messages.error(request, "Erro ao buscar turno, empresa, unidade ou perfil.")
             return redirect('menu:employees_page')
 
         except Exception as e:
@@ -238,6 +246,7 @@ def get_employee(request, employee_id):
             'last_name': employee.last_name,
             'shift_id': employee.shift.id,
             'company_id': employee.company.id,
+            'unity_id': employee.unity.id,
             'profile_id': employee.profile.id,
             'birth_date': employee.birth_date.strftime('%Y-%m-%d'),
             'is_on_vacations': employee.is_on_vacations,
@@ -260,6 +269,7 @@ def edit_employee(request):
             employee.last_name = request.POST.get('last_name')
             employee.shift_id = request.POST.get('shift') 
             employee.company_id = request.POST.get('company') 
+            employee.unity_id = request.POST.get('unity') 
             employee.profile_id = request.POST.get('profile') 
             employee.is_on_vacations = request.POST.get('vacation') == 'on'
             birth_date_str = request.POST.get('birth_date')  
@@ -706,7 +716,6 @@ def companies_page(request):
 
 
 
-
 @login_required
 @user_has_rh_profile  # Restringe o acesso a usuários com perfil RH
 def create_company(request):
@@ -755,8 +764,6 @@ def get_companies(request, company_id):
         return JsonResponse({'error': 'Empresa não encontrada'}, status=404)
 
 
-
-
 @user_has_rh_profile
 @login_required
 def edit_company(request):
@@ -797,6 +804,140 @@ def delete_company(request):
 
 
 
+# UNITS PAGE FUNCTIONS
+
+@login_required
+@user_has_rh_profile  # Restringe o acesso a usuários com perfil RH
+def units_page(request):
+
+# Obter filtros do GET
+    search = request.GET.get('search', '')  # Nome do campo no formulário é "search"
+    title_page_category = 'Unidade'
+    delete_message = 'Tem certeza de que deseja excluir as unidades selecionadas?'
+    delete_warning = 'essas unidades'
+    dynamic_url_name_create = f"menu:create_unity"
+    dynamic_url_name_edit = f"menu:edit_unity"
+    dynamic_url_name_delete = f"menu:delete_unity"
+
+    # Querysets para filtros e colaboradores
+    units = Unity.objects.all()
+    
+    # Filtragem da lista de colaboradores
+    units_list = Unity.objects.all()
+
+    if search:
+        units_list = units_list.filter(unity_name__icontains=search)
+
+    # Paginação
+    paginator = Paginator(units_list, 10)  # Exibe 10 colaboradores por página
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    # Renderizar template com contexto
+    return render(
+        request,
+        'menu/pages/units.html',
+        context={
+            'page_obj': units_list,
+            'title_page_category': title_page_category,
+            'delete_message': delete_message,
+            'delete_warning': delete_warning,
+            'dynamic_url_name_create': dynamic_url_name_create,
+            'dynamic_url_name_edit': dynamic_url_name_edit,
+            'dynamic_url_name_delete': dynamic_url_name_delete,
+            'request': request,  # Passa request para o template (opcional, para reutilizar filtros)
+        }
+    )
+
+
+
+@login_required
+@user_has_rh_profile  # Restringe o acesso a usuários com perfil RH
+def create_unity(request):
+    if request.method == 'POST':
+        name_unity = request.POST.get('name_category')
+    
+
+        # Valida se todos os campos obrigatórios foram preenchidos
+        if not all([name_unity]):
+            messages.error(request, "Todos os campos são obrigatórios.")
+            return redirect('menu:create_unity')  # Ajuste para a URL correta
+
+        try:
+
+            # Cria o objeto Employee
+            unity = Unity.objects.create(
+                unity_name=name_unity,
+            )
+
+            # Mensagem de sucesso
+            messages.success(request, f"Unidade {unity.unity_name} criada com sucesso.")
+            return redirect('menu:units_page')  # Ajuste para a URL correta
+
+
+        except Exception as e:
+            messages.error(request, f"Ocorreu um erro: {e}")
+            return redirect('menu:units_page') 
+
+    return redirect('menu:units_page')   # Ajuste para a URL correta
+
+
+
+
+@user_has_rh_profile
+@login_required
+def get_units(request, unity_id):
+    try:
+        unity = get_object_or_404(Unity, id=unity_id)
+        data = {
+            'id': unity.id,
+            'unity': unity.unity_name,
+        }
+        
+        return JsonResponse(data)
+    except unity.DoesNotExist:
+        return JsonResponse({'error': 'Unidade não encontrada'}, status=404)
+
+
+
+
+@user_has_rh_profile
+@login_required
+def edit_unity(request):
+    if request.method == 'POST':
+        unity_id = request.POST.get('category_id')
+        
+        try:
+            unity = Unity.objects.get(id=unity_id)
+            unity.unity_name = request.POST.get('name_category')
+
+            unity.save()
+
+            messages.success(request, "Unidade editada com sucesso.")
+        except Employee.DoesNotExist:
+            messages.error(request, "Unidade não encontrada.")
+        return redirect('menu:units_page')
+    return redirect('menu:units_page')
+
+
+
+@user_has_rh_profile
+@csrf_exempt
+@login_required
+def delete_unity(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)  # Obtém os dados enviados no corpo da requisição
+            unity_ids = data.get('unity_ids', [])  # IDs das unidades selecionadas
+
+            if unity_ids:
+                # Deleta as unidades com os IDs fornecidos
+                Unity.objects.filter(id__in=unity_ids).delete()
+                return JsonResponse({'message': 'Unidades excluídas com sucesso!'}, status=200)
+            return JsonResponse({'error': 'Nenhuma unidade selecionado.'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': f'Ocorreu um erro: {str(e)}'}, status=400)
+    return JsonResponse({'error': 'Método não permitido.'}, status=405)
 
 
 
@@ -808,6 +949,7 @@ def reports_page(request):
     weekly_menu = WeekMenu.objects.filter()
     user_choices = UserChoice.objects.select_related('user', 'menu', 'option').all()
     companies = Company.objects.filter()
+    units = Unity.objects.filter()
     employees = Employee.objects.filter()
 
     choices_by_company = (
@@ -838,16 +980,16 @@ def reports_page(request):
 
     # Classificar empresas por unidade de entrega
     UNIT_MAPPING = {
-        'Unidade 01 - Rua João Jose dos Reis, 59': ['FG&P', 'FCD'],
-        'Unidade 02 - Rua Jose Maria de Melo, 311': ['Sustenpack - Unidade 2'],
-        'Unidade 05 (GALPÃO NOVO) - Rua Jose Maria de Melo, 157': ['Sustenpack'],
+        'Unidade 01 - Rua João Jose dos Reis, 59': ['Unidade 1'],
+        'Unidade 02 - Rua Jose Maria de Melo, 311': ['Unidade 2'],
+        'Unidade 05 (GALPÃO NOVO) - Rua Jose Maria de Melo, 157': ['Unidade 5 - Novo Galpão'],
     }
 
     # Contabilizar funcionários por unidade de entrega
     employees_by_unit = {}
-    for unit, companies in UNIT_MAPPING.items():
+    for unit, units in UNIT_MAPPING.items():
         employees_by_unit[unit] = Employee.objects.filter(
-            company__company_name__in=companies,
+            unity__unity_name__in=units,
             is_on_vacations=False  # Apenas funcionários não de férias
         ).count()
 
@@ -888,12 +1030,10 @@ def reports_page(request):
 
 
 
-
-
 @user_has_rh_profile
 @login_required
 def generate_full_report_button(request):
     companies = Company.objects.filter()
 
-    return generate_full_report_function(request, companies)
+    return generate_full_report_function(request)
     

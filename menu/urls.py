@@ -24,7 +24,8 @@ urlpatterns = [
     path('reports/', views.reports_page, name='reports_page'),
     path('edit-option/', views.edit_option, name='edit_option'),
     path('delete-options/', views.delete_option, name='delete_option'),
-    path('generate-full_report/', views.generate_full_report_button, name='generate_full_report_button'),
+    path('generate-full-report/', views.generate_full_report_button, name='generate_full_report_button'),
+    
     path('shifts/', views.shifts_page, name='shifts_page'),
     path('create-shift/', views.create_shift, name='create_shift'),
     path('get-shift/<int:shift_id>/', views.get_shifts, name='get_shifts'),
@@ -36,6 +37,12 @@ urlpatterns = [
     path('get-company/<int:company_id>/', views.get_companies, name='get_companies'),
     path('delete-companies/', views.delete_company, name='delete_company'),
     path('edit-companies/', views.edit_company, name='edit_company'),
+
+    path('units/', views.units_page, name='units_page'),
+    path('create-unity/', views.create_unity, name='create_unity'),
+    path('get-unity/<int:unity_id>/', views.get_units, name='get_units'),
+    path('delete-units/', views.delete_unity, name='delete_unity'),
+    path('edit-units/', views.edit_unity, name='edit_unity'),
 ]
 
 

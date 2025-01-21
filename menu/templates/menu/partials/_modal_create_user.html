@@ -48,6 +48,18 @@
                             <input type="date" id="birth_date" name="birth_date" class="form-control" required>
                         </div>
                         <div class="col-md-6">
+                            <label for="unity" class="form-label">Unidade de refeição</label>
+                            <select id="unity" name="unity" class="form-select" required>
+                                <option value="" selected disabled>Selecione uma unidade</option>
+                                {% for unity in  units %}
+                                    <option value="{{ unity.id }}"> {{ unity.unity_name }} </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                     <!-- Quarta linha -->
+                     <div class="row mb-3">
                             <label for="profile" class="form-label">Perfil</label>
                             <select id="profile" name="profile" class="form-select" required>
                                 <option value="" selected disabled>Selecione um perfil</option>
@@ -55,8 +67,8 @@
                                     <option value="{{ profile.id }}"> {{ profile.profile }} </option>
                                 {% endfor %}
                             </select>
-                        </div>
                     </div>
+
                     <!-- Checkbox para Férias -->
                     <div class="row mb-3">
                         <div class="col-md-12">

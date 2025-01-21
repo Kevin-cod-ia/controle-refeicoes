@@ -57,6 +57,17 @@ class Company(models.Model):
 
     def __str__(self):
         return self.company_name
+
+
+class Unity(models.Model):
+    unity_name = models.CharField(max_length=65, verbose_name='Unidade')
+
+    class Meta:
+        verbose_name = "Unidade"
+        verbose_name_plural = "Unidades"
+
+    def __str__(self):
+        return self.unity_name
     
 
 
@@ -79,6 +90,7 @@ class Employee(models.Model):
     birth_date = models.DateField(verbose_name='Data de nasc.')
     shift = models.ForeignKey(Shift, on_delete=models.CASCADE, related_name='employee_shift', verbose_name='Turno')
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='employee_company', verbose_name='Empresa')
+    unity = models.ForeignKey(Unity, on_delete=models.CASCADE, related_name='employee_unity', verbose_name='Unidade', null=True, blank=True)
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='employee_profile', verbose_name='Perfil')
     is_on_vacations = models.BooleanField(default=False, verbose_name='Férias')
     user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='Usuário', null=True, blank=True)
