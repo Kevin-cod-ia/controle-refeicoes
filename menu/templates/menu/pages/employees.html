@@ -113,6 +113,12 @@
 
             // Inicialmente desabilita o botão
             editarButton.disabled = true;
+
+
+            function updateEndDateMin(startDateInput) {
+                const endDateInput = document.getElementById('edit_end_date');
+                endDateInput.min = startDateInput.value;
+            }
     
             // Função para verificar se algum checkbox está selecionado
             const verificarSelecao = () => {
@@ -156,6 +162,12 @@
                             document.querySelector('#edit_profile').value = data.profile_id;
                             document.querySelector('#edit_birth_date').value = data.birth_date;
                             document.querySelector('#edit_vacation').checked = data.is_on_vacations;
+                            document.querySelector('#edit_start_date').value = data.first_day_vacations || '';
+                            document.querySelector('#edit_end_date').value = data.last_day_vacations || '';
+                            document.querySelector('#edit_start_date').disabled = !data.is_on_vacations;
+                            document.querySelector('#edit_end_date').disabled = !data.is_on_vacations;
+                            document.getElementById('edit_vacation_dates').style.display = data.is_on_vacations ? 'flex' : 'none';
+                            document.querySelector('#edit_home_office').checked = data.is_home_office;
 
                             // Mostrando o modal
                             const modal =  new bootstrap.Modal(document.getElementById('#editEmployeeModal'));

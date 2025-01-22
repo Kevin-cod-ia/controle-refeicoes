@@ -93,6 +93,9 @@ class Employee(models.Model):
     unity = models.ForeignKey(Unity, on_delete=models.CASCADE, related_name='employee_unity', verbose_name='Unidade', null=True, blank=True)
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='employee_profile', verbose_name='Perfil')
     is_on_vacations = models.BooleanField(default=False, verbose_name='Férias')
+    first_day_vacations = models.DateField(verbose_name='Ínicio Férias', null=True, blank=True)
+    last_day_vacations = models.DateField(verbose_name='Final Férias', null=True, blank=True)
+    is_home_office = models.BooleanField(default=False, verbose_name='Home Office')
     user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='Usuário', null=True, blank=True)
 
     class Meta:

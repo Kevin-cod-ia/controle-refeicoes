@@ -53,10 +53,36 @@
                         <label for="edit_birth_date" class="form-label">Data de Nascimento</label>
                         <input type="date" class="form-control" id="edit_birth_date" name="birth_date" required>
                     </div>
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="edit_vacation" name="vacation">
-                        <label for="edit_vacation" class="form-check-label">Férias?</label>
+                    <div class="row mb-3">
+                        <!-- Checkbox para Férias -->
+                        <div class="col-auto">
+                            <div class="form-check form-check-inline">
+                                <input type="checkbox" id="edit_vacation" name="vacation" class="form-check-input">
+                                <label for="edit_vacation" class="form-check-label">Férias?</label>
+                            </div>
+                        </div>
+                    
+                        <!-- Checkbox para Home Office -->
+                        <div class="col-auto">
+                            <div class="form-check form-check-inline">
+                                <input type="checkbox" id="edit_home_office" name="home_office" class="form-check-input">
+                                <label for="edit_home_office" class="form-check-label">Home Office?</label>
+                            </div>
+                        </div>
                     </div>
+                    
+                    <!-- Campos de data para Férias -->
+                    <div id="edit_vacation_dates" class="row mb-3" style="display: none;">
+                        <div class="col-md-6">
+                            <label for="edit_start_date" class="form-label">Início das Férias</label>
+                            <input type="date" id="edit_start_date" name="start_date" class="form-control" disabled>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="edit_end_date" class="form-label">Fim das Férias</label>
+                            <input type="date" id="edit_end_date" name="end_date" class="form-control" disabled>
+                        </div>
+                    </div>
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -66,3 +92,24 @@
         </div>
     </div>
 </div>
+
+
+
+
+<script>
+    document.getElementById('edit_vacation').addEventListener('change', function () {
+        const vacationDates = document.getElementById('edit_vacation_dates');
+        const startDate = document.getElementById('edit_start_date');
+        const endDate = document.getElementById('edit_end_date');
+
+        if (this.checked) {
+            vacationDates.style.display = 'flex'; // Mostra os campos de data
+            startDate.disabled = false; // Habilita o campo de data de início
+            endDate.disabled = false; // Habilita o campo de data de fim
+        } else {
+            vacationDates.style.display = 'none'; // Oculta os campos de data
+            startDate.disabled = true; // Desabilita o campo de data de início
+            endDate.disabled = true; // Desabilita o campo de data de fim
+        }
+    });
+</script>

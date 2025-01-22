@@ -187,6 +187,9 @@ def create_employee(request):
         unity_id = request.POST.get('unity')
         profile_id = request.POST.get('profile')
         vacation = request.POST.get('vacation') == 'on'
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
+        home_office = request.POST.get('home_office') == 'on'
 
         # Valida se todos os campos obrigatórios foram preenchidos
         if not all([first_name, last_name, birth_date_str, shift_id, company_id, unity_id, profile_id]):
@@ -213,6 +216,9 @@ def create_employee(request):
                 unity=unity,
                 profile=profile,
                 is_on_vacations=vacation,
+                first_day_vacations=start_date if vacation == True else None,
+                last_day_vacations=end_date if vacation == True else None,
+                is_home_office=home_office,
             )
 
             # Mensagem de sucesso
@@ -250,6 +256,9 @@ def get_employee(request, employee_id):
             'profile_id': employee.profile.id,
             'birth_date': employee.birth_date.strftime('%Y-%m-%d'),
             'is_on_vacations': employee.is_on_vacations,
+            'first_day_vacations': employee.first_day_vacations if employee.is_on_vacations == True else None,
+            'last_day_vacations': employee.last_day_vacations if employee.is_on_vacations == True else None,
+            'is_home_office': employee.is_home_office,
         }
         
         return JsonResponse(data)
@@ -273,8 +282,26 @@ def edit_employee(request):
             employee.profile_id = request.POST.get('profile') 
             employee.is_on_vacations = request.POST.get('vacation') == 'on'
             birth_date_str = request.POST.get('birth_date')  
+            first_day_vacations_str  = request.POST.get('start_date')
+            last_day_vacations_str = request.POST.get('end_date')
+            employee.is_home_office = request.POST.get('home_office') == 'on'
 
             employee.birth_date = datetime.strptime(birth_date_str, '%Y-%m-%d').date()
+
+            if employee.is_on_vacations:
+                if not first_day_vacations_str or not last_day_vacations_str:
+                    messages.error(request, "Datas de início e fim das férias devem ser preenchidas.")
+                    return redirect('menu:employees_page')
+                first_day_vacations = datetime.strptime(first_day_vacations_str, '%Y-%m-%d').date()
+                last_day_vacations = datetime.strptime(last_day_vacations_str, '%Y-%m-%d').date()
+                if first_day_vacations > last_day_vacations:
+                    messages.error(request, "A data de início das férias não pode ser posterior à data de fim.")
+                    return redirect('menu:employees_page')
+                employee.first_day_vacations = first_day_vacations
+                employee.last_day_vacations = last_day_vacations
+            else:
+                employee.first_day_vacations = None
+                employee.last_day_vacations = None
 
             employee.save()
 
@@ -362,16 +389,29 @@ def update_weekly_menu(request):
         ]
 
         try:
+            data_alterada = False  # Flag para verificar alterações nas datas
+
             for day, dish, side_dish, date_meal, image_meal, qt_options, options_list in semana:
                 menu_item = WeekMenu.objects.filter(id=day).first()
                 if not menu_item:
                     messages.error(request, f"Dia {day} não encontrado no cardápio.")
                     continue
 
+                # Converter a data recebida no POST para um objeto datetime.date
+                try:
+                    date_meal_obj = datetime.strptime(date_meal, '%Y-%m-%d').date()
+                except ValueError:
+                    messages.error(request, f"A data fornecida para o dia {day} está em formato inválido.")
+                    continue
+
+                # Verificar se houve alteração na data
+                if menu_item.date_meal != date_meal_obj:
+                    data_alterada = True
+
                 # Atualizar campos simples
                 menu_item.title = dish
                 menu_item.side_dish = side_dish
-                menu_item.date_meal = date_meal
+                menu_item.date_meal = date_meal_obj
 
                 # Tratamento da imagem
                 if image_meal:
@@ -382,13 +422,16 @@ def update_weekly_menu(request):
                         messages.error(request, f"A imagem enviada para o dia {day} excede o tamanho permitido de 5MB.")
                         continue
                     menu_item.image_meal = image_meal
-                    
 
                 # Atualizar ManyToManyField com IDs de opções
                 if options_list:
                     menu_item.options.set(options_list)
 
                 menu_item.save()
+
+            # Deletar UserChoice apenas se alguma data foi alterada
+            if data_alterada:
+                UserChoice.objects.filter().delete()
 
             messages.success(request, "Cardápio atualizado com sucesso.")
         except Exception as e:
@@ -397,7 +440,6 @@ def update_weekly_menu(request):
         return redirect('menu:weekly_menu')
 
     return redirect('menu:weekly_menu')
-
 
 
 # OPTIONS PAGE FUNCTIONS

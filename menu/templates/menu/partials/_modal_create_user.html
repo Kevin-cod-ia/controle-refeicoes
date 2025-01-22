@@ -69,15 +69,36 @@
                             </select>
                     </div>
 
-                    <!-- Checkbox para Férias -->
                     <div class="row mb-3">
-                        <div class="col-md-12">
-                            <div class="form-check">
-                                <label for="vacation" class="form-check-label"> Férias? </label>
-                                <input type="checkbox" id="vacation" name="vacation" class="form-check-input">         
+                        <!-- Checkbox para Férias -->
+                        <div class="col-auto">
+                            <div class="form-check form-check-inline">
+                                <input type="checkbox" id="vacation" name="vacation" class="form-check-input">
+                                <label for="vacation" class="form-check-label">Férias?</label>
+                            </div>
+                        </div>
+                    
+                        <!-- Checkbox para Home Office -->
+                        <div class="col-auto">
+                            <div class="form-check form-check-inline">
+                                <input type="checkbox" id="home_office" name="home_office" class="form-check-input">
+                                <label for="home_office" class="form-check-label">Home Office?</label>
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- Campos de data para Férias -->
+                    <div id="vacation_dates" class="row mb-3" style="display: none;">
+                        <div class="col-md-6">
+                            <label for="start_date" class="form-label">Início das Férias</label>
+                            <input type="date" id="start_date" name="start_date" class="form-control" disabled>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="end_date" class="form-label">Fim das Férias</label>
+                            <input type="date" id="end_date" name="end_date" class="form-control" disabled>
+                        </div>
+                    </div>
+
                     <!-- Informação adicional -->
                     <p class="text-muted small mt-3">
                         Login e senha serão gerados automaticamente.  <br>
@@ -92,3 +113,23 @@
         </div>
     </div>
 </div>
+
+
+
+<script>
+    document.getElementById('vacation').addEventListener('change', function () {
+        const vacationDates = document.getElementById('vacation_dates');
+        const startDate = document.getElementById('start_date');
+        const endDate = document.getElementById('end_date');
+
+        if (this.checked) {
+            vacationDates.style.display = 'flex'; // Mostra os campos de data
+            startDate.disabled = false; // Habilita o campo de data de início
+            endDate.disabled = false; // Habilita o campo de data de fim
+        } else {
+            vacationDates.style.display = 'none'; // Oculta os campos de data
+            startDate.disabled = true; // Desabilita o campo de data de início
+            endDate.disabled = true; // Desabilita o campo de data de fim
+        }
+    });
+</script>
