@@ -1033,7 +1033,5 @@ def reports_page(request):
 @user_has_rh_profile
 @login_required
 def generate_full_report_button(request):
-    companies = Company.objects.filter()
-
     return generate_full_report_function(request)
     
