@@ -1,0 +1,261 @@
+{% extends "global/base.html" %}
+{% load menu_filters %}
+
+{% block title %}Cardápio Anterior{% endblock title %}
+
+
+
+{% block content %}
+    <!-- Título Principal -->
+    <div class="text-center my-3">
+        <h1 id="titulo_home" class="text-success-75">Cardápio Anterior</h1>
+        <p id="p_home">Confira o cardápio da semana atual.</p>
+        <p id="p_home">Cardápio {{ week_menu.0.date_meal|date:"d/m" }} à {{ week_menu.4.date_meal|date:"d/m" }}</p>
+    </div>
+
+
+
+
+    <input type="hidden" name="menu_id" value="{{ menu.id }}"> 
+    <!-- Grid de Cards -->
+    <div class="container">
+        <div class="row row-cols-1 row-cols-md-5 g-4">
+            <!-- Card 1 (Segunda) -->
+            <div class="col">
+                <div class="card h-100">
+                    <img src="{{ week_menu.0.image_meal.url }}" class="card-img-top" alt="Imagem do card">
+                    <div class="card-body" id="card_segunda">
+                        <p class="text-left"> {{ week_menu.0.date_meal }} </p>
+                        <h6 class="card-title text-left">Segunda-feira</h6>
+                        <h5 class="text-left fw-bold"> {{ week_menu.0.title}} </h5>
+                        <p class="text-left"> Com {{ week_menu.0.side_dish }} </p>
+                        <div class="d-flex flex-column align-items-start">
+                            <div class="d-flex flex-column align-items-start">
+                                <input 
+                                            type="hidden" 
+                                            name="choice_{{ week_menu.0.id }}" 
+                                            value="null"
+                                        >
+                                {% for option in week_menu.0.options.all %}
+                                    <div class="form-check form-check-inline">
+                                        <input 
+                                            class="form-check-input" 
+                                            type="radio" 
+                                            name="choice_{{ week_menu.0.id }}" 
+                                            value="{{ option.id }}" 
+                                            id="option{{ week_menu.0.id }}_{{ forloop.counter }}"
+                                            {% if user_choices|get_option:week_menu.0.id == option.id %}checked{% endif %}
+                                            disabled = true
+                                        >
+                                        <label class="form-check-label" for="option{{ week_menu.0.id }}_{{ forloop.counter }}">{{ option.name_option }}</label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+    
+                        </div>
+                    </div>
+                    <div class="card-footer text-end">
+                        <a href="{% url 'menu:progress_page' %}" class="btn btn-secondary btn-sm">?</a>
+                    </div>
+                </div>
+            </div>
+
+            
+
+            <!-- Card 2 (Terça) -->
+            <div class="col">
+                <div class="card h-100">
+                    <img src="{{ week_menu.1.image_meal.url }}"  class="card-img-top" alt="Imagem do card">
+                    <div class="card-body text-white" id="card_terca">
+                        <p class="text-left"> {{ week_menu.1.date_meal }} </p>
+                        <h6 class="card-title text-left">Terça-feira</h6>
+                        <h5 class="text-left fw-bold">{{ week_menu.1.title }}</h5>
+                        <p class="text-left">Com {{ week_menu.1.side_dish }}</p>
+                        <div class="d-flex flex-column align-items-start">
+                            <input 
+                                        type="hidden" 
+                                        name="choice_{{ week_menu.1.id }}" 
+                                        value="null"
+                                    >
+                            {% for option in week_menu.1.options.all %}
+                                <div class="form-check form-check-inline">
+                                    <input 
+                                        class="form-check-input" 
+                                        type="radio" 
+                                        name="choice_{{ week_menu.1.id }}" 
+                                        value="{{ option.id }}" 
+                                        id="option{{ week_menu.1.id }}_{{ forloop.counter }}"
+                                        {% if user_choices|get_option:week_menu.1.id == option.id %}checked{% endif %}
+                                        disabled = true
+                                    >
+                                    <label class="form-check-label" for="option{{ week_menu.1.id }}_{{ forloop.counter }}">{{ option.name_option }}</label>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                    </div>
+                    <div class="card-footer text-end">
+                        <a href="{% url 'menu:progress_page' %}" class="btn btn-secondary btn-sm">?</a>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Card 3 (Quarta) -->
+            <div class="col">
+                <div class="card h-100">
+                    <img src="{{ week_menu.2.image_meal.url }}"  class="card-img-top" alt="Imagem do card">
+                    <div class="card-body" id="card_quarta">
+                        <p class="text-left"> {{ week_menu.2.date_meal }} </p>
+                        <h6 class="card-title text-left">Quarta-feira</h6>
+                        <h5 class="text-left fw-bold"> {{ week_menu.2.title }} </h5>
+                        <p class="text-left">Com  {{ week_menu.2.side_dish }} </p>
+                        <div class="d-flex flex-column align-items-start">
+                            <input 
+                                        type="hidden" 
+                                        name="choice_{{ week_menu.2.id }}" 
+                                        value="null"
+                                    >
+                            {% for option in week_menu.2.options.all %}
+                                <div class="form-check form-check-inline">
+                                    <input 
+                                        class="form-check-input" 
+                                        type="radio" 
+                                        name="choice_{{ week_menu.2.id }}" 
+                                        value="{{ option.id }}" 
+                                        id="option{{ week_menu.2.id }}_{{ forloop.counter }}"
+                                        {% if user_choices|get_option:week_menu.2.id == option.id %}checked{% endif %}
+                                        disabled = true
+                                    >
+                                    <label class="form-check-label" for="option{{ week_menu.2.id }}_{{ forloop.counter }}">{{ option.name_option }}</label>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                    </div>
+                    <div class="card-footer text-end">
+                        <a href="{% url 'menu:progress_page' %}" class="btn btn-secondary btn-sm">?</a>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Card 1 (Quinta) -->
+            <div class="col">
+                <div class="card h-100">
+                    <img src="{{ week_menu.3.image_meal.url }}"  class="card-img-top" alt="Imagem do card">
+                    <div class="card-body text-white" id="card_quinta">
+                        <p class="text-left"> {{ week_menu.3.date_meal }}  </p>
+                        <h6 class="card-title text-left">Quinta-feira</h6>
+                        <h5 class="text-left fw-bold"> {{ week_menu.3.title}} </h5>
+                        <p class="text-left">Com {{ week_menu.3.side_dish}} </p>
+                        <div class="d-flex flex-column align-items-start">
+                            <input 
+                                        type="hidden" 
+                                        name="choice_{{ week_menu.3.id }}" 
+                                        value="null"
+                                    >
+                            {% for option in week_menu.3.options.all %}
+                                <div class="form-check form-check-inline">
+                                    <input 
+                                        class="form-check-input" 
+                                        type="radio" 
+                                        name="choice_{{ week_menu.3.id }}" 
+                                        value="{{ option.id }}" 
+                                        id="option{{ week_menu.3.id }}_{{ forloop.counter }}"
+                                        {% if user_choices|get_option:week_menu.3.id == option.id %}checked{% endif %}
+                                        disabled = true
+                                    >
+                                    <label class="form-check-label" for="option{{ week_menu.3.id }}_{{ forloop.counter }}">{{ option.name_option }}</label>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                    </div>
+                    <div class="card-footer text-end">
+                        <a href="{% url 'menu:progress_page' %}" class="btn btn-secondary btn-sm">?</a>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- Card 1 (Sexta) -->
+            <div class="col">
+                <div class="card h-100">
+                    <img src="{{ week_menu.4.image_meal.url }}"  class="card-img-top" alt="Imagem do card">
+                    <div class="card-body" id="card_sexta">
+                        <p class="text-left"> {{ week_menu.4.date_meal }}  </p>
+                        <h6 class="card-title text-left">Sexta-feira</h6>
+                        <h5 class="text-left fw-bold"> {{ week_menu.4.title}} </h5>
+                        <p class="text-left">Com {{ week_menu.4.side_dish}} </p>
+                        <div class="d-flex flex-column align-items-start">
+                            <input 
+                                        type="hidden" 
+                                        name="choice_{{ week_menu.4.id }}" 
+                                        value="null"
+                                    >
+                            {% for option in week_menu.4.options.all %}
+                                <div class="form-check form-check-inline">
+                                    <input 
+                                        class="form-check-input" 
+                                        type="radio" 
+                                        name="choice_{{ week_menu.4.id }}" 
+                                        value="{{ option.id }}" 
+                                        id="option{{ week_menu.4.id }}_{{ forloop.counter }}"
+                                        {% if user_choices|get_option:week_menu.4.id == option.id %}checked{% endif %}
+                                        disabled = true
+                                    >
+                                    <label class="form-check-label" for="option{{ week_menu.4.id }}_{{ forloop.counter }}">{{ option.name_option }}</label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="card-footer text-end">
+                        <a href="{% url 'menu:progress_page' %}" class="btn btn-secondary btn-sm">?</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Resumo -->
+    <div class="container mt-5">
+        <h2>Resumo:</h2>
+        <ul id="resumo-lista" class="list-group">
+            <li class="list-group-item">Segunda-feira: Você não pediu opção</li>
+            <li class="list-group-item">Terça-feira: Você não pediu opção</li>
+            <li class="list-group-item">Quarta-feira: Você não pediu opção</li>
+            <li class="list-group-item">Quinta-feira: Você não pediu opção</li>
+            <li class="list-group-item">Sexta-feira: Você não pediu opção</li>
+        </ul>
+    </div>
+
+
+
+    <!-- Script para Atualizar Resumo -->
+    <script>
+        document.querySelectorAll('input[type="radio"]').forEach((radio) => {
+            radio.addEventListener('change', () => {
+                const resumoLista = document.getElementById('resumo-lista');
+                const dias = ['segunda', 'terça', 'quarta', 'quinta', 'sexta'];
+                resumoLista.innerHTML = '';
+
+                dias.forEach((dia) => {
+                    const selecionado = document.querySelector(`input[name="${dia}"]:checked`);
+                    let texto = `Você não pediu opção`;
+                    if (selecionado && selecionado.value !== 'nenhuma') {
+                        texto = `Você pediu opção de ${selecionado.value}`;
+                    }
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item';
+                    li.textContent = `${dia.charAt(0).toUpperCase() + dia.slice(1)}-feira: ${texto}`;
+                    resumoLista.appendChild(li);
+                });
+            });
+        });
+    </script>
+    
+{% endblock content %}
+

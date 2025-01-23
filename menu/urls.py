@@ -7,6 +7,7 @@ app_name = 'menu'
 
 urlpatterns = [
     path('', views.home, name='home'),
+    path('last-week-menu', views.last_week_menu, name='last_week_menu'),
     path('page-in-progress', views.progress_page, name='progress_page'),
     path('weekly-menu/', views.weekly_menu, name='weekly_menu'),
     path('login', views.login, name='login'),
@@ -17,6 +18,7 @@ urlpatterns = [
     
     path('reports/', views.reports_page, name='reports_page'),
     path('generate-full-report/', views.generate_full_report_button, name='generate_full_report_button'),
+    path('generate-pdf-report/', views.generate_pdf_report_unit, name='generate_pdf_report_unit'),
 
 
     path('employees/', views.employees_page, name='employees_page'),

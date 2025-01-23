@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Options, WeekMenu, Shift, Company, Profile, Employee, UserChoice, Unity
+from .models import Options, WeekMenu, Shift, Company, Profile, Employee, UserChoice, Unity, PreviousWeekMenu
 
 
 class OptionsAdmin(admin.ModelAdmin):
@@ -8,6 +8,10 @@ class OptionsAdmin(admin.ModelAdmin):
 
 @admin.register(WeekMenu)
 class WeekMenuAdmin(admin.ModelAdmin):
+    ...
+
+@admin.register(PreviousWeekMenu)
+class PreviousWeekMenu(admin.ModelAdmin):
     ...
 
 

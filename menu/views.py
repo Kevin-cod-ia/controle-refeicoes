@@ -1,19 +1,23 @@
 import json
 from django.db.models import Count, Q
 from django.shortcuts import render, redirect, get_object_or_404 
-from .models import WeekMenu, Employee, Unity
+from .models import WeekMenu, Employee, Unity, PreviousUserChoice
 from datetime import datetime
 from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login,logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from .models import UserChoice, Options, Employee, Company, Shift, Profile
+from .models import UserChoice, Options, Employee, Company, Shift, Profile, PreviousWeekMenu
 import logging
 from utils.menu.decorators import user_has_rh_profile
 from utils.menu.report_functions import generate_full_report_function
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from collections import defaultdict
+from utils.menu.helpers import convert_to_monday, is_the_date_in_seven_days
+from utils.menu.report_pdf import generate_unity_options_pdf
+from django.http import HttpResponse
+import os
 
 
 logger = logging.getLogger(__name__)
@@ -35,6 +39,27 @@ def home(request):
         'week_menu': week_menus,
         'user_choices': user_choices_dict,
     })
+
+
+
+@login_required
+def last_week_menu(request):
+    # Obter o cardápio semanal
+    week_menus = PreviousWeekMenu.objects.filter()
+    user_choices = PreviousUserChoice.objects.filter(user=request.user)
+
+    # Obter as escolhas do usuário
+    user_choices_dict = {choice.menu.id: choice.option.id for choice in user_choices}
+
+
+    return render(request, 'menu/pages/last_week_menu.html', {
+        'week_menus': week_menus,
+        'week_menu': week_menus,
+        'user_choices': user_choices_dict,
+    })
+
+
+
 
 
 @login_required
@@ -432,6 +457,17 @@ def update_weekly_menu(request):
             # Deletar UserChoice apenas se alguma data foi alterada
             if data_alterada:
                 UserChoice.objects.filter().delete()
+
+                employees_on_vacations = Employee.objects.filter(is_on_vacations=True)
+                
+                for employee in employees_on_vacations:
+                    if employee.last_day_vacations:  # Verifica se o campo não está nulo
+                        week_comeback_vacation = convert_to_monday(employee.last_day_vacations)
+
+                    if is_the_date_in_seven_days(week_comeback_vacation) == True:
+                        employee.is_on_vacations = False
+                        employee.save()
+
 
             messages.success(request, "Cardápio atualizado com sucesso.")
         except Exception as e:
@@ -1013,7 +1049,7 @@ def reports_page(request):
         .annotate(
             employees_no_vacation_total=Count(
                 'id',
-                filter=Q(is_on_vacations=False)
+                filter=Q(is_on_vacations=False, is_home_office=False)
             )
         )
         .order_by('company__company_name')  # Ordena pelo nome da empresa
@@ -1032,7 +1068,7 @@ def reports_page(request):
     for unit, units in UNIT_MAPPING.items():
         employees_by_unit[unit] = Employee.objects.filter(
             unity__unity_name__in=units,
-            is_on_vacations=False  # Apenas funcionários não de férias
+            is_on_vacations=False, is_home_office=False  # Apenas funcionários não de férias
         ).count()
 
 
@@ -1077,3 +1113,27 @@ def reports_page(request):
 def generate_full_report_button(request):
     return generate_full_report_function(request)
     
+
+@user_has_rh_profile
+@login_required
+def generate_pdf_report_unit(request):
+    file_path = 'ALMOÇO 30.12.2024 A 03.01.2025 G1' 
+    unit_name= "Unidade 1"
+    unit_address="Rua João Jose dos Reis, 59"
+    unit_filter="Unidade 1"
+
+    # Gera o PDF
+    generate_unity_options_pdf(request, file_path, unit_name, unit_address, unit_filter)
+    
+    try:
+        # Lê o arquivo gerado
+        with open(file_path, 'rb') as pdf_file:
+            response = HttpResponse(pdf_file.read(), content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="{file_path}.pdf"'
+
+        # Retorna a resposta com o arquivo
+        return response
+    finally:
+        # Remove o arquivo do servidor
+        if os.path.exists(file_path):
+            os.remove(file_path)

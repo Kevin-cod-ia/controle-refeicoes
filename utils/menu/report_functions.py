@@ -84,28 +84,28 @@ def generate_unity_options_report(wb, unit_name, unit_address, unit_filter):
 
     for menu in week_menu:
         total_options = UserChoice.objects.filter(
-            menu=menu, user__employee__unity__unity_name=unit_filter, user__employee__is_on_vacations=False
+            menu=menu, user__employee__unity__unity_name=unit_filter, user__employee__is_on_vacations=False, user__employee__is_home_office=False
         ).count()
         omelet_count = UserChoice.objects.filter(
-            menu=menu, option__name_option="Omelete", user__employee__unity__unity_name=unit_filter, user__employee__is_on_vacations=False
+            menu=menu, option__name_option="Omelete", user__employee__unity__unity_name=unit_filter, user__employee__is_on_vacations=False, user__employee__is_home_office=False
         ).count()
         chicken_count = UserChoice.objects.filter(
-            menu=menu, option__name_option="Marmita de Frango", user__employee__unity__unity_name=unit_filter, user__employee__is_on_vacations=False
+            menu=menu, option__name_option="Marmita de Frango", user__employee__unity__unity_name=unit_filter, user__employee__is_on_vacations=False, user__employee__is_home_office=False
         ).count()
         beef_count = UserChoice.objects.filter(
-            menu=menu, option__name_option="Marmita de Carne", user__employee__unity__unity_name=unit_filter, user__employee__is_on_vacations=False
+            menu=menu, option__name_option="Marmita de Carne", user__employee__unity__unity_name=unit_filter, user__employee__is_on_vacations=False, user__employee__is_home_office=False
         ).count()
 
 
         # Pega todos os funcionários que pediram determinada opção
         omelet_employees = UserChoice.objects.filter(
-            menu=menu, option__name_option="Omelete", user__employee__unity__unity_name=unit_filter, user__employee__is_on_vacations=False
+            menu=menu, option__name_option="Omelete", user__employee__unity__unity_name=unit_filter, user__employee__is_on_vacations=False, user__employee__is_home_office=False
         )
         chicken_employees = UserChoice.objects.filter(
-            menu=menu, option__name_option="Marmita de Frango", user__employee__unity__unity_name=unit_filter, user__employee__is_on_vacations=False
+            menu=menu, option__name_option="Marmita de Frango", user__employee__unity__unity_name=unit_filter, user__employee__is_on_vacations=False, user__employee__is_home_office=False
         )
         beef_employees = UserChoice.objects.filter(
-            menu=menu, option__name_option="Marmita de Carne", user__employee__unity__unity_name=unit_filter, user__employee__is_on_vacations=False
+            menu=menu, option__name_option="Marmita de Carne", user__employee__unity__unity_name=unit_filter, user__employee__is_on_vacations=False, user__employee__is_home_office=False
         )
 
         # Gera uma lista de nomes de funcionários que pediram determinada opção
@@ -168,7 +168,7 @@ def generate_unity_options_report(wb, unit_name, unit_address, unit_filter):
         total_unit_employees_day = 0
 
         for i, option in enumerate(options_meal_list):
-            active_employees = Employee.objects.filter(unity__unity_name=unit_name, is_on_vacations=False)
+            active_employees = Employee.objects.filter(unity__unity_name=unit_name, is_on_vacations=False, is_home_office=False)
             
             
             if option == 'ALMOÇO':
@@ -184,7 +184,7 @@ def generate_unity_options_report(wb, unit_name, unit_address, unit_filter):
                     menu=menu,
                     option__name_option="Omelete",
                     user__employee__unity__unity_name=unit_name,
-                    user__employee__is_on_vacations=False
+                    user__employee__is_on_vacations=False, user__employee__is_home_office=False
                     
                 ).count()
                 total_value = omelet_count
@@ -194,7 +194,7 @@ def generate_unity_options_report(wb, unit_name, unit_address, unit_filter):
                     menu=menu,
                     option__name_option__in=["Marmita de Frango", "Marmita de Carne"],
                     user__employee__unity__unity_name=unit_name,
-                    user__employee__is_on_vacations=False
+                    user__employee__is_on_vacations=False, user__employee__is_home_office=False
                 ).count()
                 total_value = marmita_count
 
@@ -295,14 +295,22 @@ def generate_full_report_function(request):
         total_employees = len(employees)
 
         for employee in employees:
-            fill = PatternFill(start_color="FFFF00", end_color="FFFF00", fill_type="solid") if employee.is_on_vacations else None
+            fill = PatternFill(start_color="FFFF00", end_color="FFFF00", fill_type="solid") if employee.is_on_vacations or employee.is_home_office else None
 
             # Adiciona os dados do funcionário na planilha
+            full_name = False
+
+            if employee.is_on_vacations:
+                full_name = f'{employee.__str__()} - FÉRIAS {employee.first_day_vacations.strftime("%d.%m")} A {employee.last_day_vacations.strftime("%d.%m")}'
+
+            if employee.is_home_office:
+                full_name = f'{employee.__str__()} - HOME OFFICE'
+
             ws.append([ 
                 f"  {employee.unity.unity_name.upper()}  ",
                 f"  {employee.shift.shift.upper()}  ",
                 f"  {full_company_name.upper()}  ",
-                f"  {employee.__str__().upper()}  "
+                f"  {employee.__str__().upper() if full_name == False else full_name.upper()}  "
             ])
 
             # Aplica estilo às células da linha
@@ -396,7 +404,7 @@ def generate_full_report_function(request):
     # Adiciona a tabela de faturamento (entrega)
     ws.append(["",  "",  ""  ])
     for unity in Unity.objects.all():
-        active_employees = Employee.objects.filter(unity=unity, is_on_vacations=False)
+        active_employees = Employee.objects.filter(unity=unity, is_on_vacations=False, is_home_office=False)
         total_active = len(active_employees)
 
         # Preenche a linha da unidade

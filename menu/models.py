@@ -2,6 +2,12 @@ from django.db import models
 from django.contrib.auth.models import User
 import locale
 from django.utils.text import slugify
+from django.db import models
+from PIL import Image
+from io import BytesIO
+from django.core.files.uploadedfile import InMemoryUploadedFile
+import sys
+import os
 
 class Options(models.Model):
     name_option = models.CharField(max_length=65)
@@ -35,6 +41,33 @@ class WeekMenu(models.Model):
         return f'{self.date_meal.strftime("%A")}'
     
 
+    def save(self, *args, **kwargs):
+        if self.image_meal:
+            self.image_meal = self.resize_image(self.image_meal)
+        super().save(*args, **kwargs)
+
+    def resize_image(self, image):
+        img = Image.open(image)
+        img = img.resize((400, 250), Image.Resampling.LANCZOS)
+        
+        # Salvar a imagem redimensionada em memória
+        img_io = BytesIO()
+        
+        # Garantir que a imagem seja salva em um formato correto
+        img_format = image.name.split('.')[-1].upper()
+        if img_format not in ['JPEG', 'PNG']:
+            img_format = 'JPEG'  # Caso não tenha o formato adequado, forçar para JPEG
+
+        img.save(img_io, format=img_format)  # Usar o formato correto
+        img_io.seek(0)
+
+         # Extrair o caminho correto com base na data
+        date_path = self.date_meal.strftime('%Y/%m/%d')
+        file_name = os.path.basename(image.name)
+        path = os.path.join('menu/week_menu', date_path, file_name)
+        
+        # Retorna a imagem redimensionada com o nome correto
+        return InMemoryUploadedFile(img_io, None, path, f'image/{img_format.lower()}', sys.getsizeof(img_io), None)
 
 
 class Shift(models.Model):
@@ -124,19 +157,6 @@ class Employee(models.Model):
 
 
 
-class MealChoice(models.Model):
-    employee = models.ForeignKey('Employee', on_delete=models.CASCADE, related_name='meal_choices')
-    meal_date = models.DateField()
-    meal_option = models.CharField(max_length=100)
-    
-    class Meta:
-        unique_together = ('employee', 'meal_date')  # Garante uma escolha única por dia para cada funcionário.
-
-    def __str__(self):
-        return f"{self.employee.first_name} - {self.meal_date} - {self.meal_option}"
-    
-
-
 class UserChoice(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     menu = models.ForeignKey(WeekMenu, on_delete=models.CASCADE)
@@ -151,10 +171,65 @@ class UserChoice(models.Model):
 
 
 
-class MenuOption(models.Model):
-    menu = models.ForeignKey(WeekMenu, on_delete=models.CASCADE)
-    option = models.ForeignKey(Options, on_delete=models.CASCADE)
-    order = models.PositiveIntegerField()  # Armazena a posição/ordem da opção
+
+class PreviousWeekMenu(models.Model):
+    title = models.CharField(max_length=65, verbose_name="Prato Principal")
+    side_dish = models.CharField(max_length=165, verbose_name="Guarnição")
+    date_meal = models.DateField(verbose_name='Data da refeição')
+    image_meal = models.ImageField(upload_to='menu/previous_week_menu/%Y/%m/%d/', blank=True, default='', verbose_name='Foto do prato')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    options = models.ManyToManyField('Options', related_name='previous_week_menu_options', verbose_name='Opções')
 
     class Meta:
-        ordering = ['order']
+        verbose_name = "Cardápio anterior"
+        verbose_name_plural = "Cardápios anteriores"
+
+    def __str__(self):
+        import locale
+        locale.setlocale(locale.LC_TIME, 'Portuguese_Brazil')
+        return f'{self.date_meal.strftime("%A")}'
+
+    def save(self, *args, **kwargs):
+        if self.image_meal:
+            self.image_meal = self.resize_image(self.image_meal)
+        super().save(*args, **kwargs)
+
+    def resize_image(self, image):
+        img = Image.open(image)
+        img = img.resize((400, 250), Image.Resampling.LANCZOS)
+        
+        # Salvar a imagem redimensionada em memória
+        img_io = BytesIO()
+        
+        # Garantir que a imagem seja salva em um formato correto
+        img_format = image.name.split('.')[-1].upper()
+        if img_format not in ['JPEG', 'PNG']:
+            img_format = 'JPEG'  # Caso não tenha o formato adequado, forçar para JPEG
+
+        img.save(img_io, format=img_format)  # Usar o formato correto
+        img_io.seek(0)
+
+        # Extrair o caminho correto com base na data
+        date_path = self.date_meal.strftime('%Y/%m/%d')
+        file_name = os.path.basename(image.name)
+        path = os.path.join('menu/previous_week_menu', date_path, file_name)
+        
+        # Retorna a imagem redimensionada com o nome correto
+        return InMemoryUploadedFile(img_io, None, path, f'image/{img_format.lower()}', sys.getsizeof(img_io), None)
+
+
+
+
+
+class PreviousUserChoice(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    menu = models.ForeignKey(PreviousWeekMenu, on_delete=models.CASCADE)
+    option = models.ForeignKey(Options, on_delete=models.CASCADE)
+    day_of_week = models.IntegerField()
+
+    class Meta:
+        unique_together = ('user', 'menu')
+
+    def __str__(self):
+        return f"{self.user} - {self.menu}"
