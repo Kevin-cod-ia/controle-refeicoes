@@ -18,7 +18,9 @@ urlpatterns = [
     
     path('reports/', views.reports_page, name='reports_page'),
     path('generate-full-report/', views.generate_full_report_button, name='generate_full_report_button'),
-    path('generate-pdf-report/', views.generate_pdf_report_unit, name='generate_pdf_report_unit'),
+    path('generate-pdf-report-unity-one/', views.generate_pdf_report_unit_one, name='generate_pdf_report_unit_one'),
+    path('generate-pdf-report-unity-two/', views.generate_pdf_report_unit_two, name='generate_pdf_report_unit_two'),
+    path('generate-pdf-report-unity-five/', views.generate_pdf_report_unit_five, name='generate_pdf_report_unit_five'),
 
 
     path('employees/', views.employees_page, name='employees_page'),
@@ -50,6 +52,9 @@ urlpatterns = [
     path('get-unity/<int:unity_id>/', views.get_units, name='get_units'),
     path('delete-units/', views.delete_unity, name='delete_unity'),
     path('edit-units/', views.edit_unity, name='edit_unity'),
+
+    path('my-profile/', views.profile_page, name='profile_page'),
+    path('change-password', views.change_password, name='change_password'),
 ]
 
 

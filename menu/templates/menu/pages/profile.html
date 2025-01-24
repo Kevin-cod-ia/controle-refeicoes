@@ -1,0 +1,112 @@
+{% extends "global/base.html" %}
+{% load menu_filters %}
+
+{% block title %}Meu Perfil{% endblock title %}
+
+{% block content %}
+
+    <!-- Título Principal -->
+    <div class="text-center my-3">
+        <h1 id="titulo_home" class="text-success-75">Meu Perfil</h1>
+
+        <!-- Exibição de Mensagens -->
+        <div id="message-container" class="alert alert-success" style="display:none;">
+            <span id="message-content"></span>
+        </div>
+
+        <form id="user-profile-form">
+            <!-- Informações do usuário -->
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label">Nome:</label>
+                <div class="col-sm-7">
+                    <input type="text" class="form-control" value="{{ employee_data.first_name }}" readonly>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label">Sobrenome:</label>
+                <div class="col-sm-7">
+                    <input type="text" class="form-control" value="{{ employee_data.last_name }}" readonly>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label">Data de Nascimento:</label>
+                <div class="col-sm-7">
+                    <input type="date" class="form-control" value="{{ employee_data.birth_date|date:'Y-m-d' }}" readonly>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label">Turno:</label>
+                <div class="col-sm-7">
+                    <input type="text" class="form-control" value="{{ employee_data.shift }}" readonly>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label">Empresa:</label>
+                <div class="col-sm-7">
+                    <input type="text" class="form-control" value="{{ employee_data.company }}" readonly>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label">Unidade:</label>
+                <div class="col-sm-7">
+                    <input type="text" class="form-control" value="{{ employee_data.unity }}" readonly>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label">Perfil:</label>
+                <div class="col-sm-7">
+                    <input type="text" class="form-control" value="{{ employee_data.profile }}" readonly>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label">Login:</label>
+                <div class="col-sm-7">
+                    <input type="text" class="form-control" value="{{ employee_data.user }}" readonly>
+                </div>
+            </div>
+        </form>
+
+        <!-- Alteração de senha -->
+        <form id="password-change-form" method="POST" action="{% url 'menu:change_password' %}">
+            {% csrf_token %}
+            <div class="row mb-3">
+                <label for="current-password" class="col-sm-4 col-form-label">Senha Atual:</label>
+                <div class="col-sm-7">
+                    <input type="password" id="current-password" class="form-control" placeholder="Digite sua senha atual" name="current_password" required>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label for="new-password" class="col-sm-4 col-form-label">Nova Senha:</label>
+                <div class="col-sm-7">
+                    <input type="password" id="new-password" class="form-control" placeholder="Digite sua nova senha" name="new_password" required>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label for="confirm-password" class="col-sm-4 col-form-label">Confirmar Senha:</label>
+                <div class="col-sm-7">
+                    <input type="password" id="confirm-password" class="form-control" placeholder="Confirme sua nova senha" name="confirm_password" required>
+                </div>
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn btn-success">Salvar</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        {% if messages %}
+            {% for message in messages %}
+                // Exibir a mensagem do Django usando JavaScript
+                const messageContainer = document.getElementById('message-container');
+                const messageContent = document.getElementById('message-content');
+
+                messageContent.innerHTML = "{{ message }}";  // Definir o texto da mensagem
+                messageContainer.style.display = 'block';    // Exibir o contêiner da mensagem
+                setTimeout(function() {
+                    messageContainer.style.display = 'none'; // Ocultar a mensagem após 3 segundos
+                }, 3000);
+            {% endfor %}
+        {% endif %}
+    </script>
+
+{% endblock content %}

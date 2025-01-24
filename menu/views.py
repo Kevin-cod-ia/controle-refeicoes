@@ -18,6 +18,7 @@ from utils.menu.helpers import convert_to_monday, is_the_date_in_seven_days
 from utils.menu.report_pdf import generate_unity_options_pdf
 from django.http import HttpResponse
 import os
+from django.contrib.auth import update_session_auth_hash
 
 
 logger = logging.getLogger(__name__)
@@ -1116,24 +1117,90 @@ def generate_full_report_button(request):
 
 @user_has_rh_profile
 @login_required
-def generate_pdf_report_unit(request):
-    file_path = 'ALMOÇO 30.12.2024 A 03.01.2025 G1' 
+def generate_pdf_report_unit_one(request):
+    week_menu = WeekMenu.objects.filter()
+    first_day = week_menu[0].date_meal.strftime("%d.%m.%Y")
+    last_day = week_menu[4].date_meal.strftime("%d.%m.%Y")
+
+    file_path = f'ALMOÇO {first_day} A {last_day} G1' 
     unit_name= "Unidade 1"
     unit_address="Rua João Jose dos Reis, 59"
     unit_filter="Unidade 1"
 
     # Gera o PDF
-    generate_unity_options_pdf(request, file_path, unit_name, unit_address, unit_filter)
-    
-    try:
-        # Lê o arquivo gerado
-        with open(file_path, 'rb') as pdf_file:
-            response = HttpResponse(pdf_file.read(), content_type='application/pdf')
-            response['Content-Disposition'] = f'attachment; filename="{file_path}.pdf"'
+    return generate_unity_options_pdf(request, file_path, unit_name, unit_address, unit_filter)
 
-        # Retorna a resposta com o arquivo
-        return response
-    finally:
-        # Remove o arquivo do servidor
-        if os.path.exists(file_path):
-            os.remove(file_path)
+
+@user_has_rh_profile
+@login_required
+def generate_pdf_report_unit_two(request):
+    week_menu = WeekMenu.objects.filter()
+    first_day = week_menu[0].date_meal.strftime("%d.%m.%Y")
+    last_day = week_menu[4].date_meal.strftime("%d.%m.%Y")
+
+    file_path = f'ALMOÇO {first_day} A {last_day} G2' 
+    unit_name= "Unidade 2"
+    unit_address="Rua Jose Maria de Melo, 311"
+    unit_filter="Unidade 2"
+
+    # Gera o PDF
+    return generate_unity_options_pdf(request, file_path, unit_name, unit_address, unit_filter)
+
+
+
+@user_has_rh_profile
+@login_required
+def generate_pdf_report_unit_five(request):
+    week_menu = WeekMenu.objects.filter()
+    first_day = week_menu[0].date_meal.strftime("%d.%m.%Y")
+    last_day = week_menu[4].date_meal.strftime("%d.%m.%Y")
+
+    file_path = f'ALMOÇO {first_day} A {last_day} G5' 
+    unit_name= "UNIDADE 5"
+    unit_address="Rua Jose Maria de Melo, 157"
+    unit_filter="Unidade 5 - Novo Galpão"
+
+    # Gera o PDF
+    return generate_unity_options_pdf(request, file_path, unit_name, unit_address, unit_filter)
+
+
+
+@login_required
+def profile_page(request):
+    # Obter o cardápio semanal
+    employee_data = Employee.objects.filter(user=request.user)
+
+
+    return render(request, 'menu/pages/profile.html', {
+        'employee_data': employee_data[0],
+    })
+
+
+
+@login_required
+def change_password(request):
+    if request.method == 'POST':
+        current_password = request.POST.get('current_password')
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+
+        # Verificar se as senhas coincidem
+        if new_password != confirm_password:
+            messages.error(request, 'As senhas não coincidem!')
+        else:
+            # Verificar se a senha atual está correta
+            user = request.user
+            if not user.check_password(current_password):
+                messages.error(request, 'Senha atual incorreta!')
+            else:
+                # Alterar a senha
+                user.set_password(new_password)
+                user.save()
+
+                # Atualizar a sessão do usuário para que ele não seja desconectado após a mudança de senha
+                update_session_auth_hash(request, user)
+
+                # Mensagem de sucesso
+                messages.success(request, 'Senha alterada com sucesso!')
+
+        return redirect('menu:profile_page')

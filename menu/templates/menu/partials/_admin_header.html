@@ -49,7 +49,7 @@
                             {{ request.user.employee.first_name }} {{ request.user.employee.last_name }}
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="profileDropdown">
-                            <li><a class="dropdown-item" href="{% url 'menu:progress_page' %}">Meu Perfil</a></li>
+                            <li><a class="dropdown-item" href="{% url 'menu:profile_page' %}">Meu Perfil</a></li>
                             <li><a class="dropdown-item" href="{% url "menu:logout" %}">Sair</a>
                         </ul>
                     </li>

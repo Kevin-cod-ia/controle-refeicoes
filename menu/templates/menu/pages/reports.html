@@ -55,16 +55,24 @@
         </div>
 
         <div class="mt-4">
-            <a href="{% url 'menu:generate_full_report_button' %}" class="btn btn-success">
+            <!-- Botão mais largo para "Gerar relatório completo" -->
+            <a href="{% url 'menu:generate_full_report_button' %}" class="btn btn-success w-75">
                 Gerar relatório completo
             </a>
         </div>
-
-        {% comment %} <div class="mt-2">
-            <a href="{% url 'menu:generate_pdf_report_unit' %}" class="btn btn-success">
+        
+        <div class="mt-2 d-flex justify-content-between w-75 mx-auto">
+            <!-- Três botões com a mesma largura de 75% -->
+            <a href="{% url 'menu:generate_pdf_report_unit_one' %}" class="btn btn-success w-100 mx-1">
                 Gerar PDF Unidade 1
             </a>
-        </div> {% endcomment %}
+            <a href="{% url 'menu:generate_pdf_report_unit_two' %}" class="btn btn-success w-100 mx-1">
+                Gerar PDF Unidade 2
+            </a>
+            <a href="{% url 'menu:generate_pdf_report_unit_five' %}" class="btn btn-success w-100 mx-1">
+                Gerar PDF Unidade 5
+            </a>
+        </div>
         
     </div>
 
