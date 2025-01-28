@@ -153,8 +153,8 @@ body{
 }
 
 .login-container img {
-  max-width: 100px;
-  margin-bottom: 1rem;
+  max-width: 1000px;
+  margin-bottom: 0.15rem;
 }
 
 .login-container h1 {
@@ -289,3 +289,39 @@ button {
 }
 
 
+
+footer {
+  display: flex;
+  align-items: center; /* Alinha todos os itens verticalmente no centro */
+  justify-content: space-between; /* Espaço entre os elementos */
+  text-align: center;
+}
+
+
+.footer-left img,
+.footer-right img {
+    height: 100%; /* Ajusta automaticamente com base na altura do footer */
+    max-height: 110px; /* Evita que ultrapasse o limite */
+}
+
+.footer-center {
+    flex-grow: 1; /* Faz o conteúdo central ocupar espaço extra */
+    text-align: center;
+}
+
+.footer-left img
+{
+    padding-left: 4rem;
+}
+
+
+.footer-right img
+{
+    padding-right: 4rem;
+}
+
+.footer-left,
+.footer-right {
+    display: flex;
+    align-items: center; /* Garante que as imagens estejam alinhadas verticalmente */
+}

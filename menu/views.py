@@ -19,7 +19,7 @@ from utils.menu.report_pdf import generate_unity_options_pdf
 from django.http import HttpResponse
 import os
 from django.contrib.auth import update_session_auth_hash
-
+import locale
 
 logger = logging.getLogger(__name__)
 # Create your views here.
@@ -46,19 +46,35 @@ def home(request):
 @login_required
 def last_week_menu(request):
     # Obter o cardápio semanal
-    week_menus = PreviousWeekMenu.objects.filter()
+    week_menus = PreviousWeekMenu.objects.all().order_by('date_meal')
     user_choices = PreviousUserChoice.objects.filter(user=request.user)
 
-    # Obter as escolhas do usuário
-    user_choices_dict = {choice.menu.id: choice.option.id for choice in user_choices}
+    # Criar um dicionário de escolhas do usuário
+    user_choices_dict = {choice.menu.id: choice.option for choice in user_choices}
 
+    user_choices_dict_plus = {choice.menu.id: choice.option.id for choice in user_choices}
+
+    # Criar um resumo para cada dia
+    resumo = []
+    locale.setlocale(locale.LC_TIME, 'Portuguese_Brazil')
+    for menu in week_menus:
+        option = user_choices_dict.get(menu.id)
+        if option:
+            resumo.append({
+                'day': menu.date_meal.strftime('%A').capitalize(),  # Nome do dia da semana
+                'option': option.name_option,
+            })
+        else:
+            resumo.append({
+                'day': menu.date_meal.strftime('%A').capitalize(),
+                'option': None,
+            })
 
     return render(request, 'menu/pages/last_week_menu.html', {
-        'week_menus': week_menus,
         'week_menu': week_menus,
-        'user_choices': user_choices_dict,
+        'resumo': resumo,
+        'user_choices': user_choices_dict_plus,
     })
-
 
 
 
@@ -414,14 +430,41 @@ def update_weekly_menu(request):
             (5, request.POST.get('prato_principal_sexta'), request.POST.get('guarnicao_sexta'), request.POST.get('data_sexta'), request.FILES.get('foto_sexta'), request.POST.get('qt_opcoes_sexta'), get_options('sexta')),
         ]
 
-        try:
-            data_alterada = False  # Flag para verificar alterações nas datas
+        # Ordenação explícita para garantir a sequência correta
+        semana = sorted(semana, key=lambda x: x[0])
 
+        data_alterada = False  # Inicializando a flag para alteração de data
+
+        try:
             for day, dish, side_dish, date_meal, image_meal, qt_options, options_list in semana:
+                print(f"Dia: {day}, prato principal: {dish}, guarnição: {side_dish}, data: {date_meal}")  # Log para depuração
+
                 menu_item = WeekMenu.objects.filter(id=day).first()
                 if not menu_item:
                     messages.error(request, f"Dia {day} não encontrado no cardápio.")
                     continue
+    
+            # Salvar dados antigos no modelo PreviousWeekMenu
+                prev_week_menu = PreviousWeekMenu.objects.filter(id=day).first()
+                if prev_week_menu:
+                    prev_week_menu.title = menu_item.title
+                    prev_week_menu.side_dish = menu_item.side_dish
+                    prev_week_menu.date_meal = menu_item.date_meal
+                    prev_week_menu.image_meal = menu_item.image_meal
+                    prev_week_menu.options.set(menu_item.options.all())
+                    prev_week_menu.save()  # Salvar após atualizar os campos
+                    print(f"PreviousWeekMenu para o dia {day} atualizado.")  # Log de sucesso
+                else:
+                    # Se não existir, cria um novo PreviousWeekMenu
+                    prev_week_menu = PreviousWeekMenu(
+                        id=day,  # Garantir que estamos associando o mesmo índice (dia da semana)
+                        title=menu_item.title,
+                        side_dish=menu_item.side_dish,
+                        date_meal=menu_item.date_meal,
+                        image_meal=menu_item.image_meal,
+                    )
+                    prev_week_menu.save()
+                    print(f"PreviousWeekMenu para o dia {day} criado.")  # Log de criação
 
                 # Converter a data recebida no POST para um objeto datetime.date
                 try:
@@ -433,8 +476,9 @@ def update_weekly_menu(request):
                 # Verificar se houve alteração na data
                 if menu_item.date_meal != date_meal_obj:
                     data_alterada = True
+                    print(f"Data alterada para o dia {day}.")  # Log de alteração de data
 
-                # Atualizar campos simples
+                # Atualizar campos simples no WeekMenu
                 menu_item.title = dish
                 menu_item.side_dish = side_dish
                 menu_item.date_meal = date_meal_obj
@@ -453,12 +497,15 @@ def update_weekly_menu(request):
                 if options_list:
                     menu_item.options.set(options_list)
 
+                # Salvar as alterações no WeekMenu
                 menu_item.save()
+                print(f"Menu do dia {day} atualizado com sucesso.")  # Log de sucesso de atualização
+         
 
-            # Deletar UserChoice apenas se alguma data foi alterada
+            # Se houver alteração de data, limpar as escolhas anteriores
             if data_alterada:
-                UserChoice.objects.filter().delete()
-
+                PreviousUserChoice.objects.filter().delete()
+   
                 employees_on_vacations = Employee.objects.filter(is_on_vacations=True)
                 
                 for employee in employees_on_vacations:
@@ -469,14 +516,48 @@ def update_weekly_menu(request):
                         employee.is_on_vacations = False
                         employee.save()
 
+                 # Atualizar ou salvar o PreviousUserChoice
+                for day, dish, side_dish, date_meal, image_meal, qt_options, options_list in semana:
 
-            messages.success(request, "Cardápio atualizado com sucesso.")
+                    menu_item = WeekMenu.objects.filter(id=day).first()
+                    if not menu_item:
+                        continue  # Pula dias inexistentes no banco
+
+                    # Obter o PreviousWeekMenu correspondente ao dia atual
+                    prev_week_menu = PreviousWeekMenu.objects.filter(id=day).first()
+                    if not prev_week_menu:
+                        continue  # Pula dias sem registros no PreviousWeekMenu
+
+                    user_choices = UserChoice.objects.filter(menu=menu_item)
+                    for user_choice in user_choices:
+                        prev_user_choice = PreviousUserChoice.objects.filter(user=user_choice.user, menu=prev_week_menu).first()
+                        if prev_user_choice:
+                            prev_user_choice.option = user_choice.option
+                            prev_user_choice.day_of_week = user_choice.day_of_week
+                        else:
+                            # Se não houver registro anterior, cria um novo
+                            prev_user_choice = PreviousUserChoice(
+                                user=user_choice.user,
+                                menu=prev_week_menu,
+                                option=user_choice.option,
+                                day_of_week=user_choice.day_of_week,
+                            )
+                        prev_user_choice.save()
+
+                UserChoice.objects.filter().delete()
+
+                        
+                messages.success(request, "Cardápio atualizado com sucesso.")
         except Exception as e:
             messages.error(request, f"Ocorreu um erro ao atualizar o cardápio: {str(e)}")
 
         return redirect('menu:weekly_menu')
 
     return redirect('menu:weekly_menu')
+
+
+
+
 
 
 # OPTIONS PAGE FUNCTIONS

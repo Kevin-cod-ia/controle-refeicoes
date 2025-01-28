@@ -42,7 +42,8 @@ class WeekMenu(models.Model):
     
 
     def save(self, *args, **kwargs):
-        if self.image_meal:
+        if self.image_meal and isinstance(self.image_meal, InMemoryUploadedFile):
+            # Somente redimensiona se a imagem for um upload válido
             self.image_meal = self.resize_image(self.image_meal)
         super().save(*args, **kwargs)
 
@@ -61,7 +62,7 @@ class WeekMenu(models.Model):
         img.save(img_io, format=img_format)  # Usar o formato correto
         img_io.seek(0)
 
-         # Extrair o caminho correto com base na data
+        # Extrair o caminho correto com base na data
         date_path = self.date_meal.strftime('%Y/%m/%d')
         file_name = os.path.basename(image.name)
         path = os.path.join('menu/week_menu', date_path, file_name)
@@ -189,9 +190,12 @@ class PreviousWeekMenu(models.Model):
         import locale
         locale.setlocale(locale.LC_TIME, 'Portuguese_Brazil')
         return f'{self.date_meal.strftime("%A")}'
+    
+
 
     def save(self, *args, **kwargs):
-        if self.image_meal:
+        if self.image_meal and isinstance(self.image_meal, InMemoryUploadedFile):
+            # Somente redimensiona se a imagem for um upload válido
             self.image_meal = self.resize_image(self.image_meal)
         super().save(*args, **kwargs)
 
@@ -213,13 +217,10 @@ class PreviousWeekMenu(models.Model):
         # Extrair o caminho correto com base na data
         date_path = self.date_meal.strftime('%Y/%m/%d')
         file_name = os.path.basename(image.name)
-        path = os.path.join('menu/previous_week_menu', date_path, file_name)
+        path = os.path.join('menu/week_menu', date_path, file_name)
         
         # Retorna a imagem redimensionada com o nome correto
         return InMemoryUploadedFile(img_io, None, path, f'image/{img_format.lower()}', sys.getsizeof(img_io), None)
-
-
-
 
 
 class PreviousUserChoice(models.Model):

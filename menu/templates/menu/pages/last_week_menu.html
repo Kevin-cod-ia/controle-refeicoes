@@ -224,38 +224,19 @@
     <div class="container mt-5">
         <h2>Resumo:</h2>
         <ul id="resumo-lista" class="list-group">
-            <li class="list-group-item">Segunda-feira: Você não pediu opção</li>
-            <li class="list-group-item">Terça-feira: Você não pediu opção</li>
-            <li class="list-group-item">Quarta-feira: Você não pediu opção</li>
-            <li class="list-group-item">Quinta-feira: Você não pediu opção</li>
-            <li class="list-group-item">Sexta-feira: Você não pediu opção</li>
+            {% for dia in resumo %}
+                <li class="list-group-item">
+                    {{ dia.day }}: 
+                    {% if dia.option %}
+                        Você pediu a opção "{{ dia.option }}"
+                    {% else %}
+                        Você não pediu opção
+                    {% endif %}
+                </li>
+            {% endfor %}
         </ul>
     </div>
 
 
-
-    <!-- Script para Atualizar Resumo -->
-    <script>
-        document.querySelectorAll('input[type="radio"]').forEach((radio) => {
-            radio.addEventListener('change', () => {
-                const resumoLista = document.getElementById('resumo-lista');
-                const dias = ['segunda', 'terça', 'quarta', 'quinta', 'sexta'];
-                resumoLista.innerHTML = '';
-
-                dias.forEach((dia) => {
-                    const selecionado = document.querySelector(`input[name="${dia}"]:checked`);
-                    let texto = `Você não pediu opção`;
-                    if (selecionado && selecionado.value !== 'nenhuma') {
-                        texto = `Você pediu opção de ${selecionado.value}`;
-                    }
-                    const li = document.createElement('li');
-                    li.className = 'list-group-item';
-                    li.textContent = `${dia.charAt(0).toUpperCase() + dia.slice(1)}-feira: ${texto}`;
-                    resumoLista.appendChild(li);
-                });
-            });
-        });
-    </script>
-    
 {% endblock content %}
 

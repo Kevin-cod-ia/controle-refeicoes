@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Options, WeekMenu, Shift, Company, Profile, Employee, UserChoice, Unity, PreviousWeekMenu
+from .models import Options, WeekMenu, Shift, Company, Profile, Employee
+from .models import UserChoice, Unity, PreviousUserChoice, PreviousWeekMenu
 
 
 class OptionsAdmin(admin.ModelAdmin):
@@ -32,6 +33,11 @@ class ProfileAdmin(admin.ModelAdmin):
 @admin.register(Unity)
 class UnityAdmin(admin.ModelAdmin):
     ...
+
+@admin.register(PreviousUserChoice)
+class PreviousUserChoiceAdmin(admin.ModelAdmin):
+    ...
+
 
 
 def excluir_userchoices_orfaos(modeladmin, request, queryset):

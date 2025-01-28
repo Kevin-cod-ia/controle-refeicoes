@@ -8,7 +8,7 @@
 {% block content %}
     <!-- Título Principal -->
     <div class="text-center my-3">
-        <h1 id="titulo_home" class="text-success-75">Controle De Refeições <i class="fas fa-utensils"></i></h1>
+        <h1 id="titulo_home" class="text-success-75">Cardápio De Refeições <i class="fas fa-utensils"></i></h1>
         <p id="p_home">Cardápio {{ week_menu.0.date_meal|date:"d/m" }} à {{ week_menu.4.date_meal|date:"d/m" }}</p>
     </div>
 
@@ -210,11 +210,14 @@
                     </div>
                 </div>
             </div>
+        
+            <button type="submit" class="btn btn-success w-100 mt-3">Salvar Escolha</button>
+
         </div>
 
 
 
-        <button type="submit" class="btn btn-success w-100 mt-3">Salvar Escolha</button>
+        
     </form>
 
 
