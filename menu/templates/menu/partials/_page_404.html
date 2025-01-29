@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Página não encontrada</title>
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #ffffff;
+            text-align: center;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        h1 {
+            font-size: 80px;
+            margin: 0;
+            font-weight: bold;
+        }
+
+        #frase {
+            font-size: 24px;
+            margin-top: 20px;
+            height: 40px;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        a {
+            margin-top: 30px;
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #ff6600;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        a:hover {
+            background-color: #ff4500;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>404</h1>
+    <p id="frase">Só restam memórias do que um dia existiu...</p>
+    <a href="/">Voltar para a página inicial</a>
+
+    <script>
+        const frases = [
+            "Só restam memórias do que um dia existiu...",
+            "Opa! Parece que você entrou em um buraco negro da internet.",
+            "Era uma vez uma página... Agora só sobrou essa tela.",
+            "Você encontrou um lugar onde nem o Google Maps chega.",
+            "Essa página se mudou para um endereço secreto.",
+            "Talvez essa página tenha sido abduzida por ETs.",
+            "Erro 404: Página não encontrada. Talvez esteja atrás do sofá?",
+            "Se uma árvore cai na floresta e ninguém está lá para ouvir, ela faz som? Assim como essa página sumiu sem aviso.",
+            "Já tentou ligar e desligar a internet?",
+            "A URL que você digitou se aposentou e foi morar na praia.",
+            "404: Página desaparecida. Sherlock Holmes está investigando.",
+            "Se a internet fosse um RPG, essa página seria um NPC que nunca existiu.",
+            "Você desbloqueou um easter egg: o vazio absoluto!"
+        ];
+
+        function trocarFrase() {
+            const fraseElemento = document.getElementById("frase");
+            let indiceAtual = frases.indexOf(fraseElemento.innerText);
+            let novoIndice = (indiceAtual + 1) % frases.length;
+            
+            fraseElemento.style.opacity = 0;
+            setTimeout(() => {
+                fraseElemento.innerText = frases[novoIndice];
+                fraseElemento.style.opacity = 1;
+            }, 500);
+        }
+
+        setInterval(trocarFrase, 10000);
+    </script>
+
+</body>
+</html>

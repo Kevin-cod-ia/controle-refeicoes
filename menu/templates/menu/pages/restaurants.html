@@ -1,0 +1,67 @@
+{% extends "global/base.html" %}
+{% load menu_filters %}
+
+
+{% block title %}Restaurantes{% endblock title %}
+
+{% block content %}
+
+    <div class="container">
+        <!-- Título -->
+        <div class="text-center my-3">
+            <h1 id="titulo_home" class="text-success-75">Restaurantes</h1>
+        </div>
+
+        <!-- Filtros e Paginação -->
+        <form method="get" action="" class="mb-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="input-group" style="max-width: 400px;">
+                    <input type="text" name="search" class="form-control" placeholder="Pesquisar Restaurante" value="{{ request.GET.search }}">
+                    <button class="btn btn-outline-secondary" type="submit">🔍</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Tabela -->
+        <div class="table-container">
+            <table class="table table-bordered table-striped table-hover">
+                <thead class="table-secondary">
+                    <tr>
+                        <th><input type="checkbox" id="select-all"></th>
+                        <th>Restaurante</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for restaurant in page_obj %}
+                        <tr>
+                            <td><input type="checkbox" class="select-row" value='{{ restaurants.id }}'></td>
+                            <td>{{ restaurants.restaurant_name }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginação -->
+        {% include "menu/partials/_pagination.html" %}
+        
+
+        <!-- Botões -->
+    <div class="btn-group-custom mt-3">
+        <button class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#createModal">Criar</button>
+        <button id='edit-button' class="btn btn-warning me-2" 
+        data-bs-toggle="modal" 
+        data-bs-target="#editModal" >
+            Editar
+        </button>
+        <button id="delete-button" class="btn btn-danger me-2" 
+        data-bs-toggle="modal" 
+        data-bs-target="#deleteModal">
+            Excluir
+        </button>
+    </div>
+
+
+
+
+{% endblock content %}

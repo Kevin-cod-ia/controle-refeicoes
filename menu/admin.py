@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Options, WeekMenu, Shift, Company, Profile, Employee
+from .models import Options, WeekMenu, Shift, Company, Profile, Employee, Restaurant
 from .models import UserChoice, Unity, PreviousUserChoice, PreviousWeekMenu
 
 
@@ -37,6 +37,15 @@ class UnityAdmin(admin.ModelAdmin):
 @admin.register(PreviousUserChoice)
 class PreviousUserChoiceAdmin(admin.ModelAdmin):
     ...
+
+
+@admin.register(Restaurant)
+class RestaurantAdmin(admin.ModelAdmin):
+    ...
+
+    # Exclui o campo 'user' do formulário
+    exclude = ('user',)
+
 
 
 

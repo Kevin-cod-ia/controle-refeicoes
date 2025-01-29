@@ -1,7 +1,7 @@
 import json
 from django.db.models import Count, Q
 from django.shortcuts import render, redirect, get_object_or_404 
-from .models import WeekMenu, Employee, Unity, PreviousUserChoice
+from .models import WeekMenu, Employee, Unity, PreviousUserChoice, Restaurant
 from datetime import datetime
 from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login,logout as auth_logout
@@ -1289,3 +1289,45 @@ def change_password(request):
                 messages.success(request, 'Senha alterada com sucesso!')
 
         return redirect('menu:profile_page')
+    
+
+
+
+
+# RESTAURANT PAGE FUNCTIONS
+
+@login_required
+@user_has_rh_profile  # Restringe o acesso a usuários com perfil RH
+def restaurant_page(request):
+
+# Obter filtros do GET
+    search = request.GET.get('search', '')  # Nome do campo no formulário é "search"
+
+    
+    # Querysets para filtros e restaurantes
+    restaurants = Restaurant.objects.all()
+    profiles = Profile.objects.all()
+
+    # Filtragem da lista de restaurantes
+    restaurants_list = Restaurant.objects.all()
+
+    if search:
+        restaurants_list = restaurants_list.filter(restaurant_name__icontains=search)
+
+    # Paginação
+    paginator = Paginator(restaurants_list, 10)  # Exibe 10 restaurantes por página
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    # Renderizar template com contexto
+    return render(
+        request,
+        'menu/pages/restaurants.html',
+        context={
+            'restaurants': restaurants,
+            'page_obj': page_obj,
+            'profiles': profiles,
+            'request': request,  # Passa request para o template (opcional, para reutilizar filtros)
+        }
+    )
+

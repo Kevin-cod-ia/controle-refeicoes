@@ -55,6 +55,9 @@ urlpatterns = [
 
     path('my-profile/', views.profile_page, name='profile_page'),
     path('change-password', views.change_password, name='change_password'),
+
+
+    path('restaurants/', views.restaurant_page, name='restaurant_page'),
 ]
 
 
