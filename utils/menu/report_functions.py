@@ -360,7 +360,7 @@ def generate_full_report_function(request):
     ws.append(["",  "",  ""  ])
     total_general = 0
     for company_name, employees in employees_by_company.items():
-        active_employees = [e for e in employees if not e.is_on_vacations]
+        active_employees = [e for e in employees if not e.is_on_vacations and not e.is_home_office]
         total_active = len(active_employees)
         total_general += total_active
 

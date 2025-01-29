@@ -443,6 +443,14 @@ def update_weekly_menu(request):
                 if not menu_item:
                     messages.error(request, f"Dia {day} não encontrado no cardápio.")
                     continue
+
+                # Converter a data recebida no POST para um objeto datetime.date
+                try:
+                    date_meal_obj = datetime.strptime(date_meal, '%Y-%m-%d').date()
+                except ValueError:
+                    messages.error(request, f"A data fornecida para o dia {day} está em formato inválido.")
+                    continue
+
     
             # Salvar dados antigos no modelo PreviousWeekMenu
                 prev_week_menu = PreviousWeekMenu.objects.filter(id=day).first()
@@ -452,8 +460,9 @@ def update_weekly_menu(request):
                     prev_week_menu.date_meal = menu_item.date_meal
                     prev_week_menu.image_meal = menu_item.image_meal
                     prev_week_menu.options.set(menu_item.options.all())
-                    prev_week_menu.save()  # Salvar após atualizar os campos
+                    prev_week_menu.save() if menu_item.date_meal != date_meal_obj else ...  # Salvar após atualizar os campos
                     print(f"PreviousWeekMenu para o dia {day} atualizado.")  # Log de sucesso
+                    
                 else:
                     # Se não existir, cria um novo PreviousWeekMenu
                     prev_week_menu = PreviousWeekMenu(
@@ -463,20 +472,13 @@ def update_weekly_menu(request):
                         date_meal=menu_item.date_meal,
                         image_meal=menu_item.image_meal,
                     )
-                    prev_week_menu.save()
-                    print(f"PreviousWeekMenu para o dia {day} criado.")  # Log de criação
+                    prev_week_menu.save()  if menu_item.date_meal != date_meal_obj else ... # Salvar após atualizar os campos
+                    print(f"PreviousWeekMenu para o dia {day} atualizado.")  # Log de sucesso
+         
 
-                # Converter a data recebida no POST para um objeto datetime.date
-                try:
-                    date_meal_obj = datetime.strptime(date_meal, '%Y-%m-%d').date()
-                except ValueError:
-                    messages.error(request, f"A data fornecida para o dia {day} está em formato inválido.")
-                    continue
-
-                # Verificar se houve alteração na data
                 if menu_item.date_meal != date_meal_obj:
                     data_alterada = True
-                    print(f"Data alterada para o dia {day}.")  # Log de alteração de data
+
 
                 # Atualizar campos simples no WeekMenu
                 menu_item.title = dish
@@ -502,6 +504,8 @@ def update_weekly_menu(request):
                 print(f"Menu do dia {day} atualizado com sucesso.")  # Log de sucesso de atualização
          
 
+            print(f"\n===> STATUS FINAL: data_alterada = {data_alterada}")
+            
             # Se houver alteração de data, limpar as escolhas anteriores
             if data_alterada:
                 PreviousUserChoice.objects.filter().delete()
