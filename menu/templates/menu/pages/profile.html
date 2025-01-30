@@ -16,54 +16,78 @@
 
         <form id="user-profile-form">
             <!-- Informações do usuário -->
-            <div class="row mb-3">
-                <label class="col-sm-4 col-form-label">Nome:</label>
-                <div class="col-sm-7">
-                    <input type="text" class="form-control" value="{{ employee_data.first_name }}" readonly>
+            {% if request.user.restaurant.profile.profile == "Restaurante" %}
+            
+                <div class="row mb-3">
+                    <label class="col-sm-4 col-form-label">Nome Completo:</label>
+                    <div class="col-sm-7">
+                        <input type="text" class="form-control" value="{{ restaurant_data.name_restaurant }}" readonly>
+                    </div>
                 </div>
-            </div>
-            <div class="row mb-3">
-                <label class="col-sm-4 col-form-label">Sobrenome:</label>
-                <div class="col-sm-7">
-                    <input type="text" class="form-control" value="{{ employee_data.last_name }}" readonly>
+                <div class="row mb-3">
+                    <label class="col-sm-4 col-form-label">Nome Curto:</label>
+                    <div class="col-sm-7">
+                        <input type="text" class="form-control" value="{{ restaurant_data.short_name }}" readonly>
+                    </div>
                 </div>
-            </div>
-            <div class="row mb-3">
-                <label class="col-sm-4 col-form-label">Data de Nascimento:</label>
-                <div class="col-sm-7">
-                    <input type="date" class="form-control" value="{{ employee_data.birth_date|date:'Y-m-d' }}" readonly>
+                <div class="row mb-3">
+                    <label class="col-sm-4 col-form-label">Login:</label>
+                    <div class="col-sm-7">
+                        <input type="text" class="form-control" value="{{ restaurant_data.user}}" readonly>
+                    </div>
                 </div>
-            </div>
-            <div class="row mb-3">
-                <label class="col-sm-4 col-form-label">Turno:</label>
-                <div class="col-sm-7">
-                    <input type="text" class="form-control" value="{{ employee_data.shift }}" readonly>
+            
+            {% else %}
+                <div class="row mb-3">
+                    <label class="col-sm-4 col-form-label">Nome:</label>
+                    <div class="col-sm-7">
+                        <input type="text" class="form-control" value="{{ employee_data.first_name }}" readonly>
+                    </div>
                 </div>
-            </div>
-            <div class="row mb-3">
-                <label class="col-sm-4 col-form-label">Empresa:</label>
-                <div class="col-sm-7">
-                    <input type="text" class="form-control" value="{{ employee_data.company }}" readonly>
+                <div class="row mb-3">
+                    <label class="col-sm-4 col-form-label">Sobrenome:</label>
+                    <div class="col-sm-7">
+                        <input type="text" class="form-control" value="{{ employee_data.last_name }}" readonly>
+                    </div>
                 </div>
-            </div>
-            <div class="row mb-3">
-                <label class="col-sm-4 col-form-label">Unidade:</label>
-                <div class="col-sm-7">
-                    <input type="text" class="form-control" value="{{ employee_data.unity }}" readonly>
+                <div class="row mb-3">
+                    <label class="col-sm-4 col-form-label">Data de Nascimento:</label>
+                    <div class="col-sm-7">
+                        <input type="date" class="form-control" value="{{ employee_data.birth_date|date:'Y-m-d' }}" readonly>
+                    </div>
                 </div>
-            </div>
-            <div class="row mb-3">
-                <label class="col-sm-4 col-form-label">Perfil:</label>
-                <div class="col-sm-7">
-                    <input type="text" class="form-control" value="{{ employee_data.profile }}" readonly>
+                <div class="row mb-3">
+                    <label class="col-sm-4 col-form-label">Turno:</label>
+                    <div class="col-sm-7">
+                        <input type="text" class="form-control" value="{{ employee_data.shift }}" readonly>
+                    </div>
                 </div>
-            </div>
-            <div class="row mb-3">
-                <label class="col-sm-4 col-form-label">Login:</label>
-                <div class="col-sm-7">
-                    <input type="text" class="form-control" value="{{ employee_data.user }}" readonly>
+                <div class="row mb-3">
+                    <label class="col-sm-4 col-form-label">Empresa:</label>
+                    <div class="col-sm-7">
+                        <input type="text" class="form-control" value="{{ employee_data.company }}" readonly>
+                    </div>
                 </div>
-            </div>
+                <div class="row mb-3">
+                    <label class="col-sm-4 col-form-label">Unidade:</label>
+                    <div class="col-sm-7">
+                        <input type="text" class="form-control" value="{{ employee_data.unity }}" readonly>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <label class="col-sm-4 col-form-label">Perfil:</label>
+                    <div class="col-sm-7">
+                        <input type="text" class="form-control" value="{{ employee_data.profile }}" readonly>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <label class="col-sm-4 col-form-label">Login:</label>
+                    <div class="col-sm-7">
+                        <input type="text" class="form-control" value="{{ employee_data.user }}" readonly>
+                    </div>
+                </div>
+            
+        {% endif %}
         </form>
 
         <!-- Alteração de senha -->

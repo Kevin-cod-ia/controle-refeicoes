@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from .models import UserChoice, Options, Employee, Company, Shift, Profile, PreviousWeekMenu
 import logging
-from utils.menu.decorators import user_has_rh_profile
+from utils.menu.decorators import user_has_rh_profile, user_has_rh_and_restautant_profile
 from utils.menu.report_functions import generate_full_report_function
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -378,7 +378,7 @@ def delete_employee(request):
         return JsonResponse({'error': 'Nenhum colaborador selecionado'}, status=400)
 
 
-@user_has_rh_profile
+@user_has_rh_and_restautant_profile
 @login_required
 def weekly_menu(request):
     week_menu = WeekMenu.objects.prefetch_related('userchoice_set').all()
@@ -411,7 +411,7 @@ def weekly_menu(request):
 
 
 
-@user_has_rh_profile
+@user_has_rh_and_restautant_profile
 @login_required
 def update_weekly_menu(request):
 
@@ -567,7 +567,7 @@ def update_weekly_menu(request):
 # OPTIONS PAGE FUNCTIONS
 
 @login_required
-@user_has_rh_profile  # Restringe o acesso a usuários com perfil RH
+@user_has_rh_and_restautant_profile
 def options_page(request):
 
 # Obter filtros do GET
@@ -612,7 +612,7 @@ def options_page(request):
 
 
 @login_required
-@user_has_rh_profile  # Restringe o acesso a usuários com perfil RH
+@user_has_rh_and_restautant_profile
 def create_option(request):
     if request.method == 'POST':
         name_option = request.POST.get('name_category')
@@ -643,7 +643,7 @@ def create_option(request):
 
 
 
-@user_has_rh_profile
+@user_has_rh_and_restautant_profile
 @login_required
 def get_options(request, option_id):
     try:
@@ -660,7 +660,7 @@ def get_options(request, option_id):
 
 
 
-@user_has_rh_profile
+@user_has_rh_and_restautant_profile
 @login_required
 def edit_option(request):
     if request.method == 'POST':
@@ -678,7 +678,7 @@ def edit_option(request):
 
 
 
-@user_has_rh_profile
+@user_has_rh_and_restautant_profile
 @csrf_exempt
 @login_required
 def delete_option(request):
@@ -1107,7 +1107,7 @@ def delete_unity(request):
 
 
 @login_required
-@user_has_rh_profile  # Restringe o acesso a usuários com perfil RH
+@user_has_rh_and_restautant_profile
 def reports_page(request):
     
     weekly_menu = WeekMenu.objects.filter()
@@ -1194,13 +1194,13 @@ def reports_page(request):
 
 
 
-@user_has_rh_profile
+@user_has_rh_and_restautant_profile
 @login_required
 def generate_full_report_button(request):
     return generate_full_report_function(request)
     
 
-@user_has_rh_profile
+@user_has_rh_and_restautant_profile
 @login_required
 def generate_pdf_report_unit_one(request):
     week_menu = WeekMenu.objects.filter()
@@ -1216,7 +1216,7 @@ def generate_pdf_report_unit_one(request):
     return generate_unity_options_pdf(request, file_path, unit_name, unit_address, unit_filter)
 
 
-@user_has_rh_profile
+@user_has_rh_and_restautant_profile
 @login_required
 def generate_pdf_report_unit_two(request):
     week_menu = WeekMenu.objects.filter()
@@ -1233,7 +1233,7 @@ def generate_pdf_report_unit_two(request):
 
 
 
-@user_has_rh_profile
+@user_has_rh_and_restautant_profile
 @login_required
 def generate_pdf_report_unit_five(request):
     week_menu = WeekMenu.objects.filter()
@@ -1254,10 +1254,12 @@ def generate_pdf_report_unit_five(request):
 def profile_page(request):
     # Obter o cardápio semanal
     employee_data = Employee.objects.filter(user=request.user)
+    restaurant_data = Restaurant.objects.filter(user=request.user)
 
 
     return render(request, 'menu/pages/profile.html', {
-        'employee_data': employee_data[0],
+        'employee_data': employee_data[0] if employee_data else ...,
+        'restaurant_data': restaurant_data[0] if restaurant_data else ...,
     })
 
 
@@ -1312,7 +1314,7 @@ def restaurant_page(request):
     restaurants_list = Restaurant.objects.all()
 
     if search:
-        restaurants_list = restaurants_list.filter(restaurant_name__icontains=search)
+        restaurants_list = restaurants_list.filter(name_restaurant__icontains=search)
 
     # Paginação
     paginator = Paginator(restaurants_list, 10)  # Exibe 10 restaurantes por página
@@ -1326,8 +1328,102 @@ def restaurant_page(request):
         context={
             'restaurants': restaurants,
             'page_obj': page_obj,
-            'profiles': profiles,
             'request': request,  # Passa request para o template (opcional, para reutilizar filtros)
         }
     )
+
+
+@login_required
+@user_has_rh_profile  # Restringe o acesso a usuários com perfil RH
+def create_restaurant(request):
+    if request.method == 'POST':
+        name_restaurant = request.POST.get('full_name')
+        short_name = request.POST.get('short_name')
+
+        try:
+            profile = Profile.objects.get(profile='Restaurante')  # Pega um único Profile
+        except Profile.DoesNotExist:
+            messages.error(request, "Erro: O perfil 'Restaurante' não existe.")
+            return redirect('menu:restaurant_page')
+
+        # Cria o objeto Restaurant
+        restaurant = Restaurant.objects.create(
+            name_restaurant=name_restaurant,
+            short_name=short_name,
+            profile=profile
+        )
+
+        # Mensagem de sucesso
+        messages.success(request, f"Restaurante {restaurant.short_name} criado com sucesso.")
+        return redirect('menu:restaurant_page')  # Ajuste para a URL correta
+    
+    return redirect('menu:restaurant_page')   # Ajuste para a URL correta
+
+
+
+
+@user_has_rh_profile
+@login_required
+def get_restaurants(request, restaurant_id):
+    try:
+        restaurant = get_object_or_404(Restaurant, id=restaurant_id)
+        data = {
+            'id': restaurant.id,
+            'full_name': restaurant.name_restaurant,
+            'short_name': restaurant.short_name,
+        }
+        
+        return JsonResponse(data)
+    except Restaurant.DoesNotExist:
+        return JsonResponse({'error': 'Restaurante não encontrado'}, status=404)
+
+
+@user_has_rh_profile
+@login_required
+def edit_restaurant(request):
+    if request.method == 'POST':
+        restaurant_id = request.POST.get('restaurant_id')
+
+
+        try:
+            restaurant = Restaurant.objects.get(id=restaurant_id)
+            restaurant.name_restaurant = request.POST.get('full_name')
+            restaurant.short_name = request.POST.get('short_name')
+
+            restaurant.save()
+
+            messages.success(request, "Restaurante editado com sucesso.")
+        except Restaurant.DoesNotExist:
+            messages.error(request, "Restaurante não encontrado.")
+        return redirect('menu:restaurant_page')
+        
+    return redirect('menu:restaurant_page')
+
+
+
+@user_has_rh_profile
+@csrf_exempt
+@login_required
+def delete_restaurant(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)  # Obtém os dados enviados no corpo da requisição
+            restaurant_ids = data.get('restaurant_ids', [])  # IDs dos restaurantes selecionados
+
+
+            if restaurant_ids:
+                restaurants = Restaurant.objects.filter(id__in=restaurant_ids)
+                for restaurant in restaurants:
+                    user = restaurant.user
+                    restaurant.delete()  # Deleta o Employee (e automaticamente o User por causa do on_delete=models.CASCADE)
+                    if user:
+                        user.delete()  # Deleta o User caso não tenha sido deletado automaticamente
+
+                    Restaurant.objects.filter(id__in=restaurant_ids).delete()
+                return JsonResponse({'message': 'Restaurantes excluídos com sucesso!'}, status=200)
+            return JsonResponse({'error': 'Nenhum restaurante selecionado.'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': f'Ocorreu um erro: {str(e)}'}, status=400)
+    return JsonResponse({'error': 'Método não permitido.'}, status=405)
+
 

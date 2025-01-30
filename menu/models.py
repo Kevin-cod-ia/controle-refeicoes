@@ -241,7 +241,7 @@ class PreviousUserChoice(models.Model):
 class Restaurant(models.Model):
     name_restaurant = models.CharField(max_length=85, verbose_name='Restaurante')
     short_name = models.CharField(max_length=85, verbose_name='Nome Curto')
-    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='restaurant_profile', verbose_name='Perfil', default='Restaurante')
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='restaurant_profile', verbose_name='Perfil')
     user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='Usuário', null=True, blank=True)
 
     class Meta:
@@ -250,11 +250,11 @@ class Restaurant(models.Model):
 
     def save(self, *args, **kwargs):
         # Cria o login como nome.primeiro_sobrenome
-        username = self.short_name.lower()
+        username = self.short_name.lower().replace(" ","")
         current_year = datetime.datetime.today().year
         
         # Gera a senha com base na data de nascimento
-        password = f'{self.short_name.lower()}@{current_year}'
+        password = f'{self.short_name.lower().replace(" ","")}@{current_year}'
         
         if not self.user:
             # Cria um objeto User do Django com o username e a senha gerados
@@ -263,9 +263,6 @@ class Restaurant(models.Model):
         
         super().save(*args, **kwargs)  # Salva o Employee normalmente
     
-    
-    def __str__(self):
-        return f'{self.first_name} {self.last_name}'
 
 
     def __str__(self):

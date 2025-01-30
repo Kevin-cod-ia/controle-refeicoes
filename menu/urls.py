@@ -58,6 +58,10 @@ urlpatterns = [
 
 
     path('restaurants/', views.restaurant_page, name='restaurant_page'),
+    path('create-restaurant/', views.create_restaurant, name='create_restaurant'),
+    path('get-restaurant/<int:restaurant_id>/', views.get_restaurants, name='get_restaurants'),
+    path('edit-restaurant/', views.edit_restaurant, name='edit_restaurant'),
+    path('delete-restaurant/', views.delete_restaurant, name='delete_restaurant'),
 ]
 
 

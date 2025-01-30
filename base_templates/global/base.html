@@ -10,6 +10,8 @@
 
     {% if request.user.employee.profile.profile == 'RH' or request.user.is_staff == True %}
         {% include 'menu/partials/_admin_header.html' %}
+    {% elif request.user.restaurant.profile.profile == 'Restaurante'%}
+        {% include 'menu/partials/_restaurant_header.html' %}
     {% else %}
         {% include 'menu/partials/_header.html' %}
     {% endif %}

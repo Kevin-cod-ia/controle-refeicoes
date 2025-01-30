@@ -43,6 +43,7 @@
                                                 value="{{ option.id }}" 
                                                 id="option{{ week_menu.0.id }}_{{ forloop.counter }}"
                                                 {% if user_choices|get_option:week_menu.0.id == option.id %}checked{% endif %}
+                                                {% if request.user.restaurant.profile.profile == "Restaurante" %}disabled{% endif %}
                                             >
                                             <label class="form-check-label" for="option{{ week_menu.0.id }}_{{ forloop.counter }}">{{ option.name_option }}</label>
                                         </div>
@@ -83,6 +84,7 @@
                                             value="{{ option.id }}" 
                                             id="option{{ week_menu.1.id }}_{{ forloop.counter }}"
                                             {% if user_choices|get_option:week_menu.1.id == option.id %}checked{% endif %}
+                                            {% if request.user.restaurant.profile.profile == "Restaurante" %}disabled{% endif %}
                                         >
                                         <label class="form-check-label" for="option{{ week_menu.1.id }}_{{ forloop.counter }}">{{ option.name_option }}</label>
                                     </div>
@@ -121,6 +123,7 @@
                                             value="{{ option.id }}" 
                                             id="option{{ week_menu.2.id }}_{{ forloop.counter }}"
                                             {% if user_choices|get_option:week_menu.2.id == option.id %}checked{% endif %}
+                                            {% if request.user.restaurant.profile.profile == "Restaurante" %}disabled{% endif %}
                                         >
                                         <label class="form-check-label" for="option{{ week_menu.2.id }}_{{ forloop.counter }}">{{ option.name_option }}</label>
                                     </div>
@@ -159,6 +162,7 @@
                                             value="{{ option.id }}" 
                                             id="option{{ week_menu.3.id }}_{{ forloop.counter }}"
                                             {% if user_choices|get_option:week_menu.3.id == option.id %}checked{% endif %}
+                                            {% if request.user.restaurant.profile.profile == "Restaurante" %}disabled{% endif %}
                                         >
                                         <label class="form-check-label" for="option{{ week_menu.3.id }}_{{ forloop.counter }}">{{ option.name_option }}</label>
                                     </div>
@@ -198,6 +202,7 @@
                                             value="{{ option.id }}" 
                                             id="option{{ week_menu.4.id }}_{{ forloop.counter }}"
                                             {% if user_choices|get_option:week_menu.4.id == option.id %}checked{% endif %}
+                                            {% if request.user.restaurant.profile.profile == "Restaurante" %}disabled{% endif %}
                                         >
                                         <label class="form-check-label" for="option{{ week_menu.4.id }}_{{ forloop.counter }}">{{ option.name_option }}</label>
                                     </div>
@@ -211,7 +216,9 @@
                 </div>
             </div>
         
-            <button type="submit" class="btn btn-success w-100 mt-3">Salvar Escolha</button>
+            {% if request.user.restaurant.profile.profile != "Restaurante" %}
+                <button type="submit" class="btn btn-success w-100 mt-3">Salvar Escolha</button>
+            {% endif %}
 
         </div>
 

@@ -1,0 +1,38 @@
+<!-- Modal para criar colaborador -->
+<div class="modal fade" id="createRestaurantModal" tabindex="-1" aria-labelledby="createRestaurantModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="createRestaurantModalLabel">Criar Restaurante</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{% url 'menu:create_restaurant' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <!-- Primeira linha -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="full_name" class="form-label">Restaurante</label>
+                            <input type="text" id="full_name" name="full_name" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="short_name" class="form-label">Nome curto</label>
+                            <input type="text" id="short_name" name="short_name" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <!-- Informação adicional -->
+                    <p class="text-muted small mt-3">
+                        Login e senha serão gerados automaticamente.  <br>
+                        O login de acesso do restaurante é seu nome curto (ex. jeitinhobrasileiro) 
+                        e a senha gerada é composta pelo nome curto + @ + ano de cadastro (jeitinhobrasileiro@2025)
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

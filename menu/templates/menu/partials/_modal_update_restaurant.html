@@ -1,0 +1,32 @@
+<div class="modal fade" id="editRestaurantModal" tabindex="-1" aria-labelledby="editRestaurantModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="editRestaurantModalLabel">Editar Restaurante</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editRestaurantForm" method="post" action="{% url "menu:edit_restaurant" %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" name="restaurant_id" id="edit_restaurant_id">
+                    <div class="mb-3">
+                        <label for="edit_full_name" class="form-label">Nome completo</label>
+                        <input type="text" class="form-control" id="edit_full_name" name="full_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_short_name" class="form-label">Nome curto</label>
+                        <input type="text" class="form-control" id="edit_short_name" name="short_name" required>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+

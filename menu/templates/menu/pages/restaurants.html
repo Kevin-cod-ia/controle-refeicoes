@@ -34,8 +34,8 @@
                 <tbody>
                     {% for restaurant in page_obj %}
                         <tr>
-                            <td><input type="checkbox" class="select-row" value='{{ restaurants.id }}'></td>
-                            <td>{{ restaurants.restaurant_name }}</td>
+                            <td><input type="checkbox" class="select-row" value='{{ restaurant.id }}'></td>
+                            <td>{{ restaurant.name_restaurant }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -48,10 +48,10 @@
 
         <!-- Botões -->
     <div class="btn-group-custom mt-3">
-        <button class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#createModal">Criar</button>
+        <button class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#createRestaurantModal">Criar</button>
         <button id='edit-button' class="btn btn-warning me-2" 
         data-bs-toggle="modal" 
-        data-bs-target="#editModal" >
+        data-bs-target="#editRestaurantModal" >
             Editar
         </button>
         <button id="delete-button" class="btn btn-danger me-2" 
@@ -62,6 +62,155 @@
     </div>
 
 
+    {% include "menu/partials/_modal_create_restaurant.html" %}
+    {% include "menu/partials/_modal_update_restaurant.html" %}
+    {% include "menu/partials/_modal_delete_restaurant.html" %}
 
+
+    <script>
+        // Script para selecionar/desmarcar todas as linhas
+        document.getElementById('select-all').addEventListener('change', function () {
+            const checkboxes = document.querySelectorAll('.select-row');
+            checkboxes.forEach(cb => cb.checked = this.checked);
+        });
+
+        const createRestaurantModal = new bootstrap.Modal(document.getElementById('createRestaurantModal'));
+    </script>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Selecionando elementos
+            const checkboxes = document.querySelectorAll('.select-row'); // Classe correta dos checkboxes
+            const editarButton = document.querySelector('#edit-button'); // ID correto do botão "Editar"
+
+            // Inicialmente desabilita o botão
+            editarButton.disabled = true;
+
+
+            function updateEndDateMin(startDateInput) {
+                const endDateInput = document.getElementById('edit_end_date');
+                endDateInput.min = startDateInput.value;
+            }
+    
+            // Função para verificar se algum checkbox está selecionado
+            const verificarSelecao = () => {
+                const algumSelecionado = Array.from(checkboxes).some(checkbox => checkbox.checked);
+                editarButton.disabled = !algumSelecionado;
+            };
+    
+            // Adiciona o evento de mudança nos checkboxes
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function () {
+                    verificarSelecao();
+                });
+            });
+    
+            // Evento de clique no botão "Editar"
+            editarButton.addEventListener('click', function () {
+                // Obtém o checkbox selecionado
+                const selecionado = Array.from(checkboxes).find(checkbox => checkbox.checked);
+                if (selecionado) {
+                    const restauranteId = selecionado.value;
+    
+                    // Faz a requisição à API
+                    const url = `/get-restaurant/${restauranteId}/`;
+
+                    fetch(url)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Erro ao buscar os dados: ' + response.status);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+
+                            // Preenchendo os campos do modal
+                            document.querySelector('#edit_restaurant_id').value = data.id;
+                            document.querySelector('#edit_full_name').value = data.full_name;
+                            document.querySelector('#edit_short_name').value = data.short_name;
+
+                            // Mostrando o modal
+                            const modal =  new bootstrap.Modal(document.getElementById('#editRestaurantModal'));
+                            modal.show();
+                        })
+                        .catch(error => {
+                            console.error('Erro ao chamar a API:', error);
+                        });
+                } else {
+                    console.warn('Nenhum checkbox está selecionado.');
+                }
+            });
+        });
+    </script>
+
+
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const checkboxes = document.querySelectorAll('.select-row');
+            const deleteButton = document.querySelector('#delete-button');
+            const confirmDeleteButton = document.querySelector('#confirm-delete');
+            let selectedRestaurantIds = [];
+        
+            // Inicialmente desabilita o botão
+            deleteButton.disabled = true;
+        
+            // Função para verificar se algum checkbox está selecionado
+            const verificarSelecao = () => {
+                selectedRestaurantIds = Array.from(checkboxes)
+                    .filter(checkbox => checkbox.checked)
+                    .map(checkbox => checkbox.value);
+                
+                deleteButton.disabled = selectedRestaurantIds.length === 0;
+            };
+        
+            // Adiciona o evento de mudança nos checkboxes
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', verificarSelecao);
+            });
+        
+            // Abre o modal de confirmação quando o botão Excluir for clicado
+            deleteButton.addEventListener('click', function () {
+                if (selectedRestaurantIds.length > 0) {
+                    // Exibe o modal de confirmação
+                    const modal =  new bootstrap.Modal(document.getElementById('deleteRestaurantModal'));
+                    modal.show();
+                }
+            });
+        
+            // Quando o botão de confirmação de exclusão for clicado
+            confirmDeleteButton.addEventListener('click', function () {
+                if (selectedRestaurantIds.length > 0) {
+                    // Fazer a requisição para excluir os funcionários
+                    fetch('/delete-restaurant/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            restaurant_ids: selectedRestaurantIds,
+                        }),
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Erro ao excluir os restaurantes');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Se a exclusão for bem-sucedida, recarrega a página
+                        location.reload();
+                    })
+                    .catch(error => {
+                        console.error('Erro:', error);
+                    });
+                }
+            });
+        });
+        
+        
+    </script>
+    
 
 {% endblock content %}

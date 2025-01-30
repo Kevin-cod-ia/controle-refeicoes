@@ -1,0 +1,85 @@
+{% load static %}
+
+<!-- Menu Suspenso -->
+ <div class="menu-admin-div">
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top bg-success bg-opacity-75">
+        <div class="container-fluid">
+            <a class="navbar-brand text-white fw-bold" href="{% url 'menu:home' %}">
+                <img src="/media/global/logo_branco_transparente.png" alt="Logo da Empresa" width="220" height="50">
+            </a>
+            <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link text-white fw-bold" href="{% url 'menu:home' %}">Home</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-white fw-bold" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Admin
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                            <li><a class="dropdown-item" href="{% url 'menu:weekly_menu' %}">Cardápio Semanal</a></li>
+                            <li><a class="dropdown-item" href="{% url 'menu:reports_page' %}">Relatórios</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-white fw-bold" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {{ request.user.restaurant.short_name }}
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="profileDropdown">
+                            <li><a class="dropdown-item" href="{% url 'menu:profile_page' %}">Meu Perfil</a></li>
+                            <li><a class="dropdown-item" href="{% url "menu:logout" %}">Sair</a>
+                        </ul>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Controla a abertura e fechamento do submenu "Relatórios"
+        document.querySelectorAll('.dropdown-submenu > a').forEach(function (submenuToggle) {
+            submenuToggle.addEventListener('click', function (e) {
+                e.preventDefault(); // Evita o comportamento padrão do link
+                e.stopPropagation(); // Impede que o clique feche o menu principal
+
+                const submenu = this.nextElementSibling;
+
+                // Alterna a exibição do submenu
+                if (submenu.classList.contains('show')) {
+                    submenu.classList.remove('show');
+                } else {
+                    // Fecha outros submenus abertos
+                    document.querySelectorAll('.dropdown-menu.show').forEach(function (menu) {
+                        menu.classList.remove('show');
+                    });
+                    submenu.classList.add('show');
+                }
+            });
+        });
+
+        // Controla o comportamento ao clicar fora do menu
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('.dropdown')) {
+                // Fecha todos os menus e submenus
+                document.querySelectorAll('.dropdown-menu.show').forEach(function (menu) {
+                    menu.classList.remove('show');
+                });
+            }
+        });
+
+        // Garante que o menu principal "Admin" não feche automaticamente
+        document.querySelectorAll('.dropdown > a').forEach(function (menuToggle) {
+            menuToggle.addEventListener('click', function (e) {
+                e.stopPropagation(); // Impede que o clique no menu principal feche outros menus
+            });
+        });
+    });
+</script>
+
