@@ -22,12 +22,19 @@
                         <ul class="dropdown-menu" aria-labelledby="adminDropdown">
                             <li><a class="dropdown-item" href="{% url 'menu:employees_page' %}">Colaboradores</a></li>
                             <li><a class="dropdown-item" href="{% url 'menu:weekly_menu' %}">Cardápio Semanal</a></li>
+                            <li><a class="dropdown-item" href="{% url 'menu:progress_page' %}">Refeições extra</a></li>
                             <li><a class="dropdown-item" href="{% url 'menu:restaurant_page' %}">Restaurantes</a></li>
                             <li><a class="dropdown-item" href="{% url 'menu:options_page' %}">Opções</a></li>
                             <li><a class="dropdown-item" href="{% url 'menu:shifts_page' %}">Turnos</a></li>
                             <li><a class="dropdown-item" href="{% url 'menu:companies_page' %}">Empresas</a></li>
                             <li><a class="dropdown-item" href="{% url 'menu:units_page' %}">Unidades</a></li>
-                            <li><a class="dropdown-item" href="{% url 'menu:reports_page' %}">Relatórios</a></li>
+                            <li class="dropdown-submenu">
+                                <a class="dropdown-item dropdown-toggle" href="#">Relatórios</a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="{% url 'menu:reports_page' %}">Entrega / Faturamento</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'menu:reports_comparative_page' %}">Comparativo Faturamento</a></li>
+                                </ul>
+                            </li>
                         </ul>
                     </li>
                     <li class="nav-item">

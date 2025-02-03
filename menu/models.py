@@ -270,3 +270,23 @@ class Restaurant(models.Model):
 
 
 
+
+
+
+
+class MonthInvoicing(models.Model):
+
+    week_invoicing_first_day = models.DateField(verbose_name='Primeiro dia da semana')
+    week_invoicing_last_day = models.DateField(verbose_name='Último dia da semana')
+    month_invoicing = models.CharField(max_length=65, verbose_name='Mês')
+    meals_quantity = models.IntegerField()
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='month_invoicing_company', verbose_name='Empresa')
+    
+
+    class Meta:
+        verbose_name = "Relatório mensal"
+        verbose_name_plural = "Relatório mensal"
+
+    def __str__(self):
+        return self.month_invoicing
+    

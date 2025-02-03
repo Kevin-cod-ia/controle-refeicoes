@@ -1,22 +1,22 @@
 {% extends "global/base.html" %}
 {% load menu_filters %}
 
-{% block title %}Relatório Entrega / Faturamento{% endblock title %}
+{% block title %}Relatório Comparativo Faturamento{% endblock title %}
 
 
 
 {% block content %}
     <!-- Título Principal -->
     <div class="text-center my-3">
-        <h1 id="titulo_home" class="text-success-75">Relatório Entrega / Faturamento</i></h1>
+        <h1 id="titulo_home" class="text-success-75">Relatório Comparativo Faturamento</i></h1>
         <p>Correspondente ao período {{ weekly_menu.0.date_meal|date:"d/m" }}  à {{ weekly_menu.4.date_meal|date:"d/m" }}</p>
 
-        <h3>FATURAMENTO {{ weekly_menu.0.date_meal|date:"d.m.Y" }} A {{ weekly_menu.4.date_meal|date:"d.m.Y" }}</h3>
+        <h3>Quantidade de refeições solicitadas</h3>
         <table class="table table-bordered mt-3">
             <thead>
                 <tr>
-                    <th>Empresa</th>
-                    <th>Qt. colaboradores </th>
+                    <th>Fechamento</th>
+                    <th>Qt. colaboradores</th>
                 </tr>
             </thead>
             <tbody>
@@ -53,29 +53,9 @@
             <label class="form-label fw-bold"> <h4> Total </h4> </label>
             <div><span class="fw-bold"> <h4> {{ total_employees_by_unit }} </h4> </span></div>
         </div>
-
-        <div class="mt-4 d-flex justify-content-between w-75 mx-auto">
-            <!-- Botão mais largo para "Gerar relatório completo" -->
-            <a href="{% url 'menu:generate_full_report_button' %}" class="btn btn-success w-100 mx-1">
-                Gerar relatório completo
-            </a>
-
-            <a href="{% url 'menu:generate_pdf_invoicing_report' %}" class="btn btn-success w-100 mx-1">
-                Gerar PDF Faturamento
-            </a>
-        </div>
         
-        <div class="mt-2 d-flex justify-content-between w-75 mx-auto">
-            <!-- Três botões com a mesma largura de 75% -->
-            <a href="{% url 'menu:generate_pdf_report_unit_one' %}" class="btn btn-success w-100 mx-1">
-                Gerar PDF Unidade 1
-            </a>
-            <a href="{% url 'menu:generate_pdf_report_unit_two' %}" class="btn btn-success w-100 mx-1">
-                Gerar PDF Unidade 2
-            </a>
-            <a href="{% url 'menu:generate_pdf_report_unit_five' %}" class="btn btn-success w-100 mx-1">
-                Gerar PDF Unidade 5
-            </a>
+        <div class="mt-5">
+            <button class="btn btn-success">Gerar relatório comparativo</button>
         </div>
         
     </div>

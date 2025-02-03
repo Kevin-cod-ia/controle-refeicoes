@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+handler404 = 'menu.views.custom_404_view'
 
 
 urlpatterns = [

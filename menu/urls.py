@@ -21,7 +21,10 @@ urlpatterns = [
     path('generate-pdf-report-unity-one/', views.generate_pdf_report_unit_one, name='generate_pdf_report_unit_one'),
     path('generate-pdf-report-unity-two/', views.generate_pdf_report_unit_two, name='generate_pdf_report_unit_two'),
     path('generate-pdf-report-unity-five/', views.generate_pdf_report_unit_five, name='generate_pdf_report_unit_five'),
+    path('generate-pdf-invoicing-report/', views.generate_pdf_invoicing_report, name='generate_pdf_invoicing_report'),
 
+
+    path('comparative-reports/', views.reports_comparative_page, name='reports_comparative_page'),
 
     path('employees/', views.employees_page, name='employees_page'),
     path('create-employee', views.create_employee, name='create_employee'),

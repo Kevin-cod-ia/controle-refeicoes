@@ -325,3 +325,54 @@ footer {
     display: flex;
     align-items: center; /* Garante que as imagens estejam alinhadas verticalmente */
 }
+
+
+.page_404_custom {
+  text-align: center; 
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+
+.page_404_custom h1{
+  font-size: 80px;
+  margin: 0;
+  font-weight: bold;
+}
+
+
+.page_404_custom img {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-top: 20px;
+}
+
+.page_404_custom #frase {
+  font-size: 24px;
+  margin-top: 20px;
+  height: 40px;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.page_404_custom a {
+  margin-top: 30px;
+  display: inline-block;
+  padding: 10px 20px;
+  font-size: 18px;
+  background-color: #ff6600;
+  color: #ffffff;
+  text-decoration: none;
+  border-radius: 5px;
+  transition: background 0.3s;
+}
+
+.page_404_custom a:hover {
+  background-color: #ff4500;
+}

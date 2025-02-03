@@ -15,7 +15,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from collections import defaultdict
 from utils.menu.helpers import convert_to_monday, is_the_date_in_seven_days
-from utils.menu.report_pdf import generate_unity_options_pdf
+from utils.menu.report_pdf import generate_unity_options_pdf, generate_invoicing_report_pdf
 from django.http import HttpResponse
 import os
 from django.contrib.auth import update_session_auth_hash
@@ -40,6 +40,10 @@ def home(request):
         'week_menu': week_menus,
         'user_choices': user_choices_dict,
     })
+
+
+def custom_404_view(request, exception):
+    return render(request, 'menu/partials/_page_404.html', status=404)
 
 
 
@@ -1250,6 +1254,21 @@ def generate_pdf_report_unit_five(request):
 
 
 
+@user_has_rh_and_restautant_profile
+@login_required
+def generate_pdf_invoicing_report(request):
+    week_menu = WeekMenu.objects.filter()
+    first_day = week_menu[0].date_meal.strftime("%d.%m.%Y")
+    last_day = week_menu[4].date_meal.strftime("%d.%m.%Y")
+
+    file_path = f'FATURAMENTO {first_day} A {last_day}' 
+
+    # Gera o PDF
+    return generate_invoicing_report_pdf(request, file_path, first_day, last_day)
+
+
+
+
 @login_required
 def profile_page(request):
     # Obter o cardápio semanal
@@ -1292,7 +1311,6 @@ def change_password(request):
 
         return redirect('menu:profile_page')
     
-
 
 
 
@@ -1426,4 +1444,92 @@ def delete_restaurant(request):
             return JsonResponse({'error': f'Ocorreu um erro: {str(e)}'}, status=400)
     return JsonResponse({'error': 'Método não permitido.'}, status=405)
 
+
+
+
+@login_required
+@user_has_rh_and_restautant_profile
+def reports_comparative_page(request):
+    
+    weekly_menu = WeekMenu.objects.filter()
+    user_choices = UserChoice.objects.select_related('user', 'menu', 'option').all()
+    companies = Company.objects.filter()
+    units = Unity.objects.filter()
+    employees = Employee.objects.filter()
+
+    choices_by_company = (
+        Employee.objects
+        .values('company__company_name')  # Agrupa por empresa
+        .annotate(
+            total_options=Count(
+                'user__userchoice__option', 
+                filter=Q(user__userchoice__isnull=False)
+            )
+        )  # Conta as opções ou retorna 0 se não houver
+        .order_by('company__company_name')  # Ordena pelo nome da empresa
+    )
+
+    # Obter o total de funcionários não de férias por empresa
+    employees_no_vacation = (
+        Employee.objects
+        .values('company__company_name')  # Agrupa por empresa
+        .annotate(
+            employees_no_vacation_total=Count(
+                'id',
+                filter=Q(is_on_vacations=False, is_home_office=False)
+            )
+        )
+        .order_by('company__company_name')  # Ordena pelo nome da empresa
+    )
+
+
+    # Classificar empresas por unidade de entrega
+    UNIT_MAPPING = {
+        'Unidade 01 - Rua João Jose dos Reis, 59': ['Unidade 1'],
+        'Unidade 02 - Rua Jose Maria de Melo, 311': ['Unidade 2'],
+        'Unidade 05 (GALPÃO NOVO) - Rua Jose Maria de Melo, 157': ['Unidade 5 - Novo Galpão'],
+    }
+
+    # Contabilizar funcionários por unidade de entrega
+    employees_by_unit = {}
+    for unit, units in UNIT_MAPPING.items():
+        employees_by_unit[unit] = Employee.objects.filter(
+            unity__unity_name__in=units,
+            is_on_vacations=False, is_home_office=False  # Apenas funcionários não de férias
+        ).count()
+
+
+    # Juntar os resultados em um único dicionário
+    company_data = {}
+    for choice in choices_by_company:
+        company_name = choice['company__company_name']
+        company_data[company_name] = {
+            'total_options': choice['total_options'],
+            'employees_no_vacation_total': 0,  # Valor padrão
+        }
+
+    for employee in employees_no_vacation:
+        company_name = employee['company__company_name']
+        if company_name in company_data:
+            company_data[company_name]['employees_no_vacation_total'] = employee['employees_no_vacation_total']
+        else:
+            company_data[company_name] = {
+                'total_options': 0,  # Caso não tenha opções associadas
+                'employees_no_vacation_total': employee['employees_no_vacation_total'],
+            }
+
+    total_employees_by_unit = sum(employees_by_unit.values())
+
+    # Renderizar template com contexto
+    return render(
+        request,
+        'menu/pages/comparative_report.html',
+        context={
+            'weekly_menu': weekly_menu,
+            'company_data': company_data,
+            'employees_by_unit': employees_by_unit,
+            'total_employees_by_unit': total_employees_by_unit,
+            'request': request,
+        }
+    )
 

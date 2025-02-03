@@ -1,90 +1,100 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>404 - Página não encontrada</title>
-    <style>
-        body {
-            background-color: #1a1a1a;
-            color: #ffffff;
-            text-align: center;
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
+{% extends "global/base.html" %}
+{% load menu_filters %}
 
-        h1 {
+
+{% block title %}404 - Página não encontrada{% endblock title %}
+
+    {% block content %}
+        <div class="page_404_custom" style="
+        text-align: center; 
+        font-family: Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;">
+
+            <h1 style="
             font-size: 80px;
             margin: 0;
-            font-weight: bold;
-        }
+            font-weight: bold;">404</h1>
 
-        #frase {
+            <img src="{% static 'global/erro_404_img.png' %}"  alt="Imagem erro 404" style="
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-top: 20px;">
+
+            <p id="frase" style="
             font-size: 24px;
             margin-top: 20px;
             height: 40px;
-            transition: opacity 0.5s ease-in-out;
-        }
+            transition: opacity 0.5s ease-in-out;">Só restam memórias do que um dia existiu...</p>
 
-        a {
+            <a href="{% url 'menu:home' %}" style="
             margin-top: 30px;
             display: inline-block;
             padding: 10px 20px;
             font-size: 18px;
-            background-color: #ff6600;
+            background-color: #1DEF7C;
             color: #ffffff;
             text-decoration: none;
             border-radius: 5px;
-            transition: background 0.3s;
-        }
+            transition: background 0.3s;">Voltar para a página inicial</a>
+        <div>
 
-        a:hover {
-            background-color: #ff4500;
-        }
-    </style>
-</head>
-<body>
+        <script>
+            const frases = [
+                "Só restam memórias do que um dia existiu...",
+                "404 – Essa página sumiu mais rápido que meu salário!",
+                "Parece que essa página tirou férias sem avisar.",
+                "Você achou uma página secreta! Brincadeira… não existe nada aqui.",
+                "Erro 404: Até minha vida tem mais sentido que essa página.",
+                "Essa página foi buscar pão e nunca mais voltou.",
+                "404 – Página não encontrada. Mas encontrou bugs? Isso tem de monte!",
+                "Erro 404: O servidor procurou, procurou… e desistiu.",
+                "Se você encontrar essa página, avise. Estamos procurando também!",
+                "Já tentou perguntar no Google? Parece que essa página foi embora.",
+                "Essa página foi procurar sentido na vida… e ainda não voltou.",
+                "404 – Essa página foi fazer uma trilha e nunca mais deu notícias.",
+                "404 – Essa página se escondeu melhor que o Wally.",
+                "404 – Essa página foi reciclada! Mas fique tranquilo, estamos criando algo novo.",
+                "Parece que essa página virou embalagem biodegradável e sumiu rapidinho!",
+                "404 – Essa página se desintegrou mais rápido que um canudo de papel.",
+                "Não encontramos a página… mas garantimos que a busca foi sustentável!",
+                "404 – Página não encontrada, mas pelo menos não gerou lixo eletrônico.",
+                "404 – Nossa embalagem é sustentável, mas essa página… simplesmente desapareceu!",
+                "Ops! Parece que essa página foi buscar um café e se perdeu no caminho.",
+                "Página não encontrada, mas que tal um lanchinho enquanto procuramos?",
+                "Procuramos essa página tanto quanto você procura comida na geladeira de madrugada.",
+                "404 – Se uma página some na internet e ninguém vê, ela realmente existiu?",
+                "Essa página foi buscar o sentido da vida... e ainda não voltou.",
+                "404 – A jornada é mais importante que o destino, mas nesse caso, não há destino.",
+                "Você procurou esta página, mas será que foi ela que se perdeu ou foi você?",
+                "404 – A ausência dessa página talvez seja um convite para viver o momento presente.",
+                "Nada é permanente… nem essa página.",
+                "404 – O verdadeiro erro é continuar procurando onde não há nada.",
+                "O caminho da sabedoria começa aceitando que essa página não está mais aqui."
+            ];
 
-    <h1>404</h1>
-    <p id="frase">Só restam memórias do que um dia existiu...</p>
-    <a href="/">Voltar para a página inicial</a>
+            function trocarFrase() {
+                const fraseElemento = document.getElementById("frase");
+                let novoIndice;
+                
+                do {
+                    novoIndice = Math.floor(Math.random() * frases.length);
+                } while (frases[novoIndice] === fraseElemento.innerText);
+                
+                fraseElemento.style.opacity = 0;
+                setTimeout(() => {
+                    fraseElemento.innerText = frases[novoIndice];
+                    fraseElemento.style.opacity = 1;
+                }, 500);
+            }
 
-    <script>
-        const frases = [
-            "Só restam memórias do que um dia existiu...",
-            "Opa! Parece que você entrou em um buraco negro da internet.",
-            "Era uma vez uma página... Agora só sobrou essa tela.",
-            "Você encontrou um lugar onde nem o Google Maps chega.",
-            "Essa página se mudou para um endereço secreto.",
-            "Talvez essa página tenha sido abduzida por ETs.",
-            "Erro 404: Página não encontrada. Talvez esteja atrás do sofá?",
-            "Se uma árvore cai na floresta e ninguém está lá para ouvir, ela faz som? Assim como essa página sumiu sem aviso.",
-            "Já tentou ligar e desligar a internet?",
-            "A URL que você digitou se aposentou e foi morar na praia.",
-            "404: Página desaparecida. Sherlock Holmes está investigando.",
-            "Se a internet fosse um RPG, essa página seria um NPC que nunca existiu.",
-            "Você desbloqueou um easter egg: o vazio absoluto!"
-        ];
+            setInterval(trocarFrase, 6000);
+        </script>
 
-        function trocarFrase() {
-            const fraseElemento = document.getElementById("frase");
-            let indiceAtual = frases.indexOf(fraseElemento.innerText);
-            let novoIndice = (indiceAtual + 1) % frases.length;
-            
-            fraseElemento.style.opacity = 0;
-            setTimeout(() => {
-                fraseElemento.innerText = frases[novoIndice];
-                fraseElemento.style.opacity = 1;
-            }, 500);
-        }
-
-        setInterval(trocarFrase, 10000);
-    </script>
-
-</body>
-</html>
+    {% endblock content %}

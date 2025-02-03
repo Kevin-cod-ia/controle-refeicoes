@@ -1,13 +1,14 @@
 from reportlab.lib.pagesizes import letter, landscape
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 from io import BytesIO
 from django.http import HttpResponse
 from menu.models import Employee, Company, WeekMenu, Unity, UserChoice
 import locale
 from collections import defaultdict
+
 
 
 def generate_unity_options_pdf(request, file_path, unit_name, unit_address, unit_filter):
@@ -233,6 +234,132 @@ def generate_unity_options_pdf(request, file_path, unit_name, unit_address, unit
     buffer.close()
 
     return response
+
+
+
+def generate_invoicing_report_pdf(request, file_path, first_day, last_day):
+    # Criar buffer de memória para o PDF
+    buffer = BytesIO()
+
+    # Configuração inicial do PDF
+    pdf = SimpleDocTemplate(buffer, pagesize=landscape(letter), rightMargin=30, leftMargin=30, topMargin=30, bottomMargin=18)
+    elements = []
+
+    styles = getSampleStyleSheet()
+
+    # Dicionário de mapeamento dos nomes completos das empresas
+    COMPANY_FULL_NAMES = {
+        'FG&P': 'FG&P CONSULTORIA ADMINISTRATIVA LTDA.',
+        'FCD': 'FCD ARMAZENAGEM E DISTRIBUIÇÃO LTDA',
+        'Sustenpack': 'SUSTENPACK EMBALAGENS SUSTENTAVEIS IMPORTACAO E EX',
+    }
+
+    # Estilos
+    title_style = ParagraphStyle('TitleStyle', parent=styles['Heading1'], fontSize=14, textColor=colors.black,
+                                 alignment=1, backColor=colors.lightgrey, spaceAfter=10, underline=True, leading=16)
+    
+    total_style = ParagraphStyle('TotalStyle', parent=styles['Normal'], fontSize=12, textColor=colors.black,
+                                 fontWeight='bold', alignment=1)
+    
+    total_style_red = ParagraphStyle('TotalStyleRed', parent=styles['Normal'], fontSize=12, textColor=colors.red,
+                                     fontWeight='bold', alignment=1)
+    
+    centered_style = ParagraphStyle('CenteredStyle', parent=styles['Normal'], fontSize=10, alignment=1)
+
+    # Criando primeira tabela - FATURAMENTO
+    title1 = Paragraph(f"FATURAMENTO {first_day} A {last_day}", title_style)
+    elements.append(title1)
+
+    employees = Employee.objects.select_related('company').order_by('company__company_name', 'first_name', 'last_name')
+    employees_by_company = {}
+    total_general = 0  # Inicializa a contagem total
+
+    for employee in employees:
+        company_name = employee.company.company_name
+        full_company_name = COMPANY_FULL_NAMES.get(company_name, company_name)
+        if full_company_name not in employees_by_company:
+            employees_by_company[full_company_name] = []
+        employees_by_company[full_company_name].append(employee)
+
+    faturamento_data = []
+    for company_name, employees in employees_by_company.items():
+        active_employees = [e for e in employees if not e.is_on_vacations and not e.is_home_office]
+        total_active = len(active_employees)
+        total_general += total_active
+        faturamento_data.append([company_name, Paragraph(str(total_active), centered_style)])
+
+    # Adiciona linha de total
+    faturamento_data.append([Paragraph("", total_style), Paragraph(str(total_general), total_style)])
+
+    tabela_faturamento = Table(faturamento_data, colWidths=[300, 150])
+    tabela_faturamento.setStyle(TableStyle([
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -2), 10),
+        ('FONTSIZE', (-1, -1), (-1, -1), 12),
+        ('TEXTCOLOR', (-1, -1), (-1, -1), colors.black),
+        ('BACKGROUND', (0, -1), (-1, -1), colors.lightgrey),
+        ('FONTWEIGHT', (0, -1), (-1, -1), 'BOLD'),
+        ('ALIGN', (1, 0), (1, -1), 'CENTER')
+    ]))
+
+    elements.append(tabela_faturamento)
+    elements.append(Spacer(1, 20))
+
+    # Criando segunda tabela - FATURAMENTO (ENTREGA)
+    title2 = Paragraph(f"FATURAMENTO (ENTREGA) {first_day} A {last_day}", title_style)
+    elements.append(title2)
+
+    entrega_data = []
+    total_entrega = 0
+
+    for unity in Unity.objects.all():
+        active_employees = Employee.objects.filter(unity=unity, is_on_vacations=False, is_home_office=False)
+        total_active = len(active_employees)
+        total_entrega += total_active
+
+        # Mapeia o nome da unidade para a descrição completa
+        unity_name_map = {
+            "Unidade 1": "UNIDADE 1 - Rua João Jose dos Reis, 59",
+            "Unidade 2": "UNIDADE 2 - Rua Jose Maria de Melo, 311",
+            "Unidade 5 - Novo Galpão": "UNIDADE 5 (GALPÃO NOVO) - Rua Jose Maria de Melo, 157"
+        }
+        unity_name = unity_name_map.get(unity.unity_name, unity.unity_name)
+
+        entrega_data.append([unity_name, "ALMOÇO (CUBA)", Paragraph(str(total_active), total_style_red)])
+
+    # Adiciona a linha de total
+    entrega_data.append([Paragraph("", total_style), Paragraph("", total_style), Paragraph(str(total_entrega), total_style_red)])
+
+    tabela_entrega = Table(entrega_data, colWidths=[300, 150, 100])
+    tabela_entrega.setStyle(TableStyle([
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -2), 10),
+        ('FONTSIZE', (-1, -1), (-1, -1), 12),
+        ('TEXTCOLOR', (-1, -1), (-1, -1), colors.black),
+        ('TEXTCOLOR', (-1, 0), (-1, -2), colors.red),
+        ('BACKGROUND', (0, -1), (-1, -1), colors.lightgrey),
+        ('FONTWEIGHT', (0, -1), (-1, -1), 'BOLD'),
+        ('ALIGN', (1, 0), (1, -1), 'CENTER'),
+        ('ALIGN', (2, 0), (2, -1), 'CENTER')
+    ]))
+
+    elements.append(tabela_entrega)
+
+    # Construção do PDF
+    pdf.build(elements)
+
+    # Preparar resposta HTTP para download
+    buffer.seek(0)  # Voltar para o início do arquivo
+    response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{file_path}.pdf"'
+
+    # Limpeza do buffer após o envio
+    buffer.close()
+
+    return response
+
 
 
 # Executa a função
